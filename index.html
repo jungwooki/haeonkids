@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>해온한의원 소아(청소년)과 문진표</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+:root{
+  --ios-bg:#F2F2F7; --ios-card:#FFFFFF; --ios-tint:#FFCC00; --ios-tint-deep:#C79000;
+  --ios-text:#000000; --ios-gray:#8E8E93; --ios-separator:#E5E5EA;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard',sans-serif;background:var(--ios-bg);color:var(--ios-text);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;margin:0;}
+.animate-fade-in{animation:springFadeIn .5s cubic-bezier(.16,1,.3,1) forwards;}
+@keyframes springFadeIn{0%{opacity:0;transform:translateY(15px)}100%{opacity:1;transform:translateY(0)}}
+.step-content{display:none}.step-content.active{display:flex}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:10px}
+
+#report-view{display:none}
+#report-view.active{display:block}
+.report-scroll{width:100%;height:100%;overflow-y:auto;background:#E8E8ED;padding:24px 0 60px}
+.report-toolbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--ios-separator);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.a4-page{width:210mm;min-height:297mm;background:#fff;margin:0 auto 14mm auto;box-shadow:0 6px 24px rgba(0,0,0,.08);border-radius:6px;box-sizing:border-box;padding:12mm 13mm;display:flex;flex-direction:column}
+.a4-page:last-child{margin-bottom:0}
+.rp-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--ios-tint);padding-bottom:10px;margin-bottom:14px}
+.rp-brand{display:flex;align-items:center;gap:8px}
+.rp-title{font-size:20px;font-weight:800;color:#000;letter-spacing:-.3px}
+.rp-sub{font-size:11px;color:var(--ios-gray);margin-top:2px}
+.rp-page-badge{font-size:10px;font-weight:700;color:var(--ios-tint-deep);background:#FFF9E0;border:1px solid #FFE58F;border-radius:999px;padding:4px 10px}
+.rp-info-bar{display:grid;grid-template-columns:repeat(5,1fr);background:#FAFAFC;border:1px solid var(--ios-separator);border-radius:10px;padding:10px 0;margin-bottom:16px}
+.rp-info-item{text-align:center;border-right:1px solid var(--ios-separator)}
+.rp-info-item:last-child{border-right:none}
+.rp-info-label{font-size:9px;color:var(--ios-gray);font-weight:700}
+.rp-info-value{font-size:14px;font-weight:800;color:#000;margin-top:2px}
+.rp-section-title{font-size:13px;font-weight:800;color:#000;display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.rp-card{background:#fff;border:1px solid var(--ios-separator);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.rp-soft{background:#FAFAFC}
+.rp-footer{margin-top:auto;padding-top:8px;border-top:1px solid var(--ios-separator);display:flex;justify-content:space-between;font-size:8px;color:var(--ios-gray)}
+.rp-chip{display:inline-block;font-size:10px;font-weight:700;background:#FFF9E0;color:var(--ios-tint-deep);border:1px solid #FFE58F;border-radius:999px;padding:3px 9px;margin:2px 3px 2px 0}
+.rp-chart-box{position:relative;width:100%;height:180px}
+.rp-organ-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--ios-separator);font-size:11px}
+.rp-organ-row:last-child{border-bottom:none}
+.rp-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.rp-ring{width:118px;height:118px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rp-ring-inner{width:86px;height:86px;background:#fff;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+@page{size:A4;margin:0}
+@media print{
+  body *{visibility:hidden}
+  #report-view,#report-view *{visibility:visible}
+  #report-view{position:absolute;top:0;left:0;width:100%}
+  .report-scroll{overflow:visible;background:#fff;padding:0}
+  .no-print{display:none!important}
+  .a4-page{box-shadow:none;margin:0;border-radius:0;page-break-after:always;width:210mm;min-height:297mm}
+  .a4-page:last-child{page-break-after:auto}
+}
+</style>
+</head>
+<body class="p-0 text-[17px] m-0 overflow-hidden">
+
+<div id="app-shell" class="flex flex-col w-screen h-screen bg-[var(--ios-bg)] relative overflow-hidden">
+  <div class="h-16 bg-white/90 backdrop-blur-md border-b border-[#E5E5EA] flex items-center justify-between px-4 shrink-0 z-30 relative">
+    <button onclick="prevStep()" id="btn-back" class="text-slate-800 flex items-center gap-1 font-semibold text-[16px] active:opacity-50 transition-opacity hidden w-20">
+      <i data-lucide="chevron-left" class="w-6 h-6 -ml-2"></i> 이전
+    </button>
+    <div id="nav-brand" class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+      <div class="w-7 h-7 bg-[#FFF9E0] rounded-[8px] flex items-center justify-center border border-[#FFE58F]">
+        <i data-lucide="baby" class="w-4 h-4 text-[#C79000]"></i>
+      </div>
+      <span id="nav-title" class="font-bold text-[17px] text-black">소개</span>
+    </div>
+    <div class="w-20"></div>
+  </div>
+  <div id="progress-track" class="h-[3px] w-full bg-[#E5E5EA] shrink-0">
+    <div id="progress-fill" class="h-full bg-[#FFCC00] transition-all duration-300" style="width:0%"></div>
+  </div>
+
+  <div id="scroll-container" class="flex-1 overflow-y-auto w-full px-5 pt-6 pb-10 scroll-smooth">
+    <div id="steps-container" class="w-full max-w-2xl mx-auto flex flex-col">
+
+      <div id="step-1" class="step-content active animate-fade-in flex-col items-center text-center justify-center mt-10">
+        <div class="w-[100px] h-[100px] bg-white rounded-[28px] flex items-center justify-center mb-8 shadow-sm border border-gray-100">
+          <i data-lucide="heart-handshake" class="w-[50px] h-[50px] text-[#FFCC00]"></i>
+        </div>
+        <h2 class="text-[32px] font-extrabold tracking-tight text-black mb-4">환영합니다</h2>
+        <p class="text-[17px] text-[#3C3C43] leading-[26px] mb-12 max-w-md px-4">
+          해온한의원 소아(청소년)과 문진표입니다. 아이의 만 나이에 맞춰 문항이 자동으로 구성되고, 작성이 끝나면 오장변증·기혈수 밸런스와 성장 리포트가 바로 만들어집니다.
+        </p>
+        <button onclick="nextStep()" class="w-full max-w-xs bg-[#FFCC00] text-black font-bold text-[18px] py-4 rounded-[16px] shadow-sm hover:bg-[#E6B800] active:scale-[0.98] transition-all">
+          문진표 작성 시작하기
+        </button>
+        <button onclick="openSearchView()" class="mt-4 text-[14px] font-semibold text-[#8E8E93] underline active:opacity-50">
+          지난 문진 기록 검색
+        </button>
+      </div>
+
+      <div id="dynamic-container" class="step-content flex-col gap-6 w-full"></div>
+    </div>
+  </div>
+
+  <div id="bottom-action" class="shrink-0 bg-white border-t border-gray-200 p-4 pb-6 flex justify-center hidden z-40">
+    <button onclick="nextStep()" id="next-btn" class="w-full max-w-2xl bg-[#FFCC00] text-black font-bold text-[18px] py-4 rounded-[16px] shadow-sm hover:bg-[#E6B800] active:scale-[0.98] transition-all">다음 단계</button>
+  </div>
+</div>
+
+<!-- ===================== 리포트 뷰 ===================== -->
+<div id="report-view">
+<div class="report-scroll">
+  <div class="report-toolbar no-print">
+    <button onclick="backToForm()" class="flex items-center gap-1 font-semibold text-[15px] text-slate-800 active:opacity-50">
+      <i data-lucide="chevron-left" class="w-5 h-5"></i> 문진표로 돌아가기
+    </button>
+    <span id="save-status" class="text-[12px] font-semibold text-[#8E8E93]"></span>
+    <div class="flex gap-2">
+      <button onclick="resetAll()" class="text-red-500 font-semibold text-[14px] px-4 py-2">처음부터 다시</button>
+      <button onclick="window.print()" class="bg-black text-white font-bold text-[14px] px-5 py-2.5 rounded-[10px] flex items-center gap-2">
+        <i data-lucide="printer" class="w-4 h-4"></i> 인쇄 / PDF 저장
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE 1 : 오장변증 + 기혈수 + 성장발달 변증 -->
+  <div class="a4-page">
+    <div class="rp-header">
+      <div class="rp-brand">
+        <i data-lucide="baby" class="w-6 h-6 text-[#C79000]"></i>
+        <div><div class="rp-title">해온한의원 아이 건강 리포트</div><div class="rp-sub">오장변증 · 기혈수 밸런스 · 성장발달 변증</div></div>
+      </div>
+      <div class="rp-page-badge" id="rp-badge-1">1 / 2</div>
+    </div>
+
+    <div class="rp-info-bar">
+      <div class="rp-info-item"><div class="rp-info-label">이름</div><div class="rp-info-value" id="rp-name">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">성별 / 만나이</div><div class="rp-info-value" id="rp-age">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">키 / 체중</div><div class="rp-info-value" id="rp-body">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">보호자</div><div class="rp-info-value" id="rp-guardian">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">측정일</div><div class="rp-info-value" id="rp-date">-</div></div>
+    </div>
+
+    <div class="rp-card rp-soft">
+      <div class="rp-section-title"><i data-lucide="message-circle" class="w-4 h-4 text-[#C79000]"></i>주소증 (가장 불편한 증상)</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="rp-complaint">-</p>
+    </div>
+
+    <div class="flex gap-4">
+      <div class="rp-card flex-1 flex flex-col items-center">
+        <div class="rp-section-title self-start"><i data-lucide="activity" class="w-4 h-4 text-[#C79000]"></i>오장(五臟) 균형도</div>
+        <div id="rp-radar"></div>
+        <p class="text-[10px] text-[#8E8E93] mt-1 text-center">차트 중심에서 <b>멀수록 튼튼</b>, 중심에 <b>가까울수록 허약</b>한 신호입니다</p>
+        <div id="rp-organ-legend" class="w-full mt-2"></div>
+      </div>
+      <div class="rp-card flex-1 flex flex-col items-center">
+        <div class="rp-section-title self-start"><i data-lucide="droplets" class="w-4 h-4 text-sky-600"></i>기(氣)·혈(血)·수(水) 밸런스</div>
+        <div id="rp-qhs-radar"></div>
+        <p class="text-[10px] text-[#8E8E93] mt-1 text-center">이 차트도 <b>바깥쪽일수록 건강</b>, <b>중심에 가까울수록 관리가 필요</b>합니다</p>
+        <div id="rp-qhs-legend" class="w-full mt-2"></div>
+      </div>
+    </div>
+
+    <div class="rp-card">
+      <div class="rp-section-title"><i data-lucide="lightbulb" class="w-4 h-4 text-[#C79000]"></i>성장발달 변증 — 쉽게 풀어드리면</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="rp-growth-diagnosis">-</p>
+    </div>
+
+    <div class="rp-card rp-soft">
+      <p class="text-[12px] leading-[19px] text-[#3C3C43]">위 소견은 보호자 문진 응답을 기준으로 한 예비 분석입니다. 진료실에서 직접 진맥·설진 등 정밀 진찰 후 아이에게 맞는 처방과 관리 계획을 안내해 드립니다.</p>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 리포트는 진료 참고용이며 의학적 진단을 대체하지 않습니다.</span><span id="rp-footer-1"></span></div>
+  </div>
+
+  <!-- PAGE 2 : 성장 & 생활습관 -->
+  <div class="a4-page">
+    <div class="rp-header">
+      <div class="rp-brand">
+        <i data-lucide="ruler" class="w-6 h-6 text-[#C79000]"></i>
+        <div><div class="rp-title">성장 & 생활습관 리포트</div><div class="rp-sub">키·체중 백분위, 식이·휴식·운동 가이드</div></div>
+      </div>
+      <div class="rp-page-badge" id="rp-badge-2">2 / 2</div>
+    </div>
+
+    <div class="flex gap-4 mb-4">
+      <div class="rp-card flex-1">
+        <div class="rp-section-title"><i data-lucide="trending-up" class="w-4 h-4 text-sky-600"></i>키 백분위</div>
+        <div class="rp-chart-box"><canvas id="rp-height-chart"></canvas></div>
+        <p class="text-[11px] text-[#8E8E93] mt-1" id="rp-height-comment">-</p>
+      </div>
+      <div class="rp-card flex-1">
+        <div class="rp-section-title"><i data-lucide="scale" class="w-4 h-4 text-emerald-600"></i>체중 백분위</div>
+        <div class="rp-chart-box"><canvas id="rp-weight-chart"></canvas></div>
+        <p class="text-[11px] text-[#8E8E93] mt-1" id="rp-weight-comment">-</p>
+      </div>
+    </div>
+
+    <div class="rp-card rp-soft mb-3">
+      <div class="rp-section-title"><i data-lucide="badge-check" class="w-4 h-4 text-[#C79000]"></i>BMI / 체형 종합</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="rp-bmi-summary">-</p>
+    </div>
+
+    <div class="flex gap-4 mb-3">
+      <div class="rp-card flex-1">
+        <div class="rp-section-title"><i data-lucide="home" class="w-4 h-4 text-[#C79000]"></i>생활습관 요약</div>
+        <div id="rp-lifestyle" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+      </div>
+      <div class="rp-card flex-1">
+        <div class="rp-section-title"><i data-lucide="salad" class="w-4 h-4 text-[#C79000]"></i>성장을 돕는 식이·휴식·운동</div>
+        <div id="rp-growth-tips" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+      </div>
+    </div>
+
+    <div class="rp-card">
+      <div class="rp-section-title"><i data-lucide="stethoscope" class="w-4 h-4 text-[#C79000]"></i>종합 소견</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="rp-overall-opinion">-</p>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 리포트는 진료 참고용이며 의학적 진단을 대체하지 않습니다.</span><span id="rp-footer-2"></span></div>
+  </div>
+
+  <!-- PAGE 3 : 정서·불안 체크리스트 (8세 이상만 표시) -->
+  <div class="a4-page" id="rp-page-3">
+    <div class="rp-header">
+      <div class="rp-brand">
+        <i data-lucide="smile" class="w-6 h-6 text-[#C79000]"></i>
+        <div><div class="rp-title">정서 · 불안 체크리스트 결과</div><div class="rp-sub">아이가 직접 응답한 자가 체크 결과입니다</div></div>
+      </div>
+      <div class="rp-page-badge">3 / 3</div>
+    </div>
+
+    <div class="rp-card flex items-center gap-6">
+      <div class="rp-ring" id="rp-anxiety-ring">
+        <div class="rp-ring-inner">
+          <div class="text-[24px] font-extrabold text-black" id="rp-anxiety-count">0/10</div>
+          <div class="text-[10px] text-[#8E8E93] font-bold">그렇다 응답</div>
+        </div>
+      </div>
+      <div class="flex-1">
+        <div class="text-[15px] font-extrabold text-black mb-1" id="rp-anxiety-level">-</div>
+        <p class="text-[12px] leading-[19px] text-[#3C3C43]" id="rp-anxiety-comment">-</p>
+      </div>
+    </div>
+
+    <div class="rp-card rp-soft">
+      <div class="rp-section-title"><i data-lucide="list-checks" class="w-4 h-4 text-[#C79000]"></i>‘그렇다’로 응답한 항목</div>
+      <div id="rp-anxiety-items">-</div>
+    </div>
+
+    <div class="rp-card">
+      <p class="text-[12px] leading-[19px] text-[#3C3C43]">
+        본 체크리스트는 해온한의원이 자체 구성한 예비 선별용 문항이며, 표준화된 임상 심리검사를 대체하지 않습니다.
+        결과가 관찰 필요 이상으로 나온 경우 전문 심리상담·정신건강의학과 평가를 함께 권해 드립니다.
+      </p>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 결과는 진료 참고용이며 진단이 아닙니다.</span><span id="rp-footer-3"></span></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 지난 문진 기록 검색 ===================== -->
+<div id="search-view" class="fixed inset-0 z-40" style="display:none;background:var(--ios-bg);">
+  <div class="h-16 bg-white/90 backdrop-blur-md border-b border-[#E5E5EA] flex items-center justify-between px-4">
+    <button onclick="closeSearchView()" class="flex items-center gap-1 font-semibold text-[16px] text-slate-800 active:opacity-50">
+      <i data-lucide="chevron-left" class="w-6 h-6 -ml-2"></i> 닫기
+    </button>
+    <span class="font-bold text-[17px] text-black">지난 문진 기록 검색</span>
+    <div class="w-16"></div>
+  </div>
+  <div class="max-w-2xl mx-auto p-5">
+    <div class="flex gap-2 mb-4">
+      <input id="search-input" type="text" placeholder="아이 이름으로 검색" class="flex-1 bg-white border border-[#E5E5EA] rounded-[12px] px-4 py-3 text-[16px] outline-none" onkeydown="if(event.key==='Enter') searchRecords(this.value)">
+      <button onclick="searchRecords(document.getElementById('search-input').value)" class="bg-[#FFCC00] text-black font-bold px-5 rounded-[12px]">검색</button>
+    </div>
+    <div id="search-status" class="text-[13px] text-[#8E8E93] mb-3"></div>
+    <div id="search-results" class="flex flex-col gap-2"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== 0. 저장소 설정 (Google Sheet) =====================
+   1) 새 구글시트를 만들고 확장 프로그램 > Apps Script 에서 아래 코드를 붙여넣으세요:
+
+   function doPost(e){
+     var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('records')
+           || SpreadsheetApp.getActiveSpreadsheet().insertSheet('records');
+     var d = JSON.parse(e.postData.contents);
+     sh.appendRow([new Date(), d.name, d.birthDate, d.gender, d.ageGroup, JSON.stringify(d.formData)]);
+     return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+   }
+   function doGet(e){
+     var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('records');
+     var q = (e.parameter.q || '').trim();
+     var rows = sh ? sh.getDataRange().getValues() : [];
+     var out = [];
+     for (var i=0;i<rows.length;i++){
+       var r = rows[i];
+       if (!q || (r[1] && String(r[1]).indexOf(q) !== -1)){
+         out.push({ts:r[0], name:r[1], birthDate:r[2], gender:r[3], ageGroup:r[4], data:r[5]});
+       }
+     }
+     out.sort(function(a,b){ return new Date(b.ts) - new Date(a.ts); });
+     return ContentService.createTextOutput(JSON.stringify({ok:true, results:out})).setMimeType(ContentService.MimeType.JSON);
+   }
+
+   2) 배포 > 새 배포 > 웹 앱: 실행 계정 "나", 액세스 권한 "모든 사용자"로 배포
+   3) 발급된 웹 앱 URL을 아래 SHEET_URL 에 붙여넣으세요.
+================================================================= */
+const CONFIG = { SHEET_URL: 'https://script.google.com/macros/s/AKfycbwSQm9QZ_Dieskz1YNk9s9OFT5y_5Ip0kVyTr3WaaKakgU6VIfzOuxgBteH6koZqT_sVw/exec' }; // 예: 'https://script.google.com/macros/s/AKfycb.../exec'
+let cameFromSearch = false;
+
+/* ===================== 1. State ===================== */
+let currentStep = 1;
+const formData = {
+  name:'', gender:'남아', birthDate:'', weight:'', height:'',
+  healthStatus:'건강한 편', frequentColds:false, suddenWeakness:false, chiefComplaint:'',
+  // 0~7세 전용
+  birthWeight:'', deliveryType:'자연분만', jaundiceInfection:false, breastFeedingMonth:'', momPregnancyIllness:'',
+  // 8세 이상 전용
+  healthPromotion:[], orientalTreatment:[],
+  // 생활환경
+  caregivers:[], caregiversOther:'', mainPlaymate:'', playTimeAvg:'', favoritePerson:'',
+  withParentTime:'', withParentPerson:'', parentingStyle:'자유로운 편', parentingStyleOther:'',
+  potty:[], stoolStatus:[], stoolFreq:'',
+  // 생활습관
+  dietHabits:[], allergyFood:'', sleepAlone:'혼자 잔다', sleepLate11:false,
+  napFreq:'', napHours:'', wakesAtNight:false, phoneBeforeSleep:false,
+  socialTraits:[], screenTimeHours:'', emotionTraits:[], angerResponse:[], angerOther:'',
+  playActive:'', playQuiet:'', playIndoor:'', playOutdoor:'', playSpecial:'',
+  playWithDadHours:'', outdoorActivityPerMonth:'', familyOutdoorPerMonth:'',
+  eduEnglish:false, eduEnglishNote:'', eduArt:false, eduArtNote:'', eduMusic:false, eduMusicNote:'',
+  eduHomeVisit:false, eduHomeVisitNote:'', eduExerciseType:'', eduOther:'',
+  institutionHours:'', weeklyPrivateEduCount:'',
+  // 건강 Part4
+  surgeryHistory:false, hospitalHistory:false, geneticDisease:'', otherMedicalNote:'',
+  specialConstitution:[], allergyOtherType:'',
+  feverMedicine:'', feverOtherResponse:'', indigestionMedicine:'', indigestionOtherResponse:'',
+  sysLiver:[], sysHeart:[], sysSpleen:[], sysLung:[], sysKidney:[],
+  guardianName:'',
+  // 정서 · 불안 체크(8세 이상)
+  anxietyChecklist:[]
+};
+
+window.updateData = function(key,val){ formData[key]=val; };
+window.updateCheck = function(cat,val,checked){
+  if(checked){ if(!formData[cat].includes(val)) formData[cat].push(val); }
+  else{ formData[cat]=formData[cat].filter(i=>i!==val); }
+};
+window.setSegmented = function(field,val,btnEl){
+  formData[field]=val;
+  const parent=btnEl.parentElement;
+  parent.querySelectorAll('button').forEach(b=>{ b.className="flex-1 py-2 text-[15px] font-medium rounded-[7px] text-[#8E8E93] transition-all duration-200"; });
+  btnEl.className="flex-1 py-2 text-[15px] font-bold rounded-[7px] bg-white shadow-[0_3px_8px_rgba(0,0,0,0.12)] text-black transition-all duration-200";
+};
+window.updateBirthDate = function(val){ formData.birthDate=val; refreshStep(); };
+
+/* ===================== 2. 나이 분기 ===================== */
+function getAgeYears(){
+  if(!formData.birthDate) return null;
+  const b=new Date(formData.birthDate), t=new Date();
+  let age=t.getFullYear()-b.getFullYear();
+  const m=t.getMonth()-b.getMonth();
+  if(m<0 || (m===0 && t.getDate()<b.getDate())) age--;
+  return age;
+}
+function getAgeGroup(){ const a=getAgeYears(); return (a!==null && a>=8) ? 'old' : 'young'; }
+function getTotalSteps(){ return getAgeGroup()==='old' ? 6 : 5; }
+
+/* ===================== 3. UI 빌더 ===================== */
+const UI = {
+  group:(c)=>`<div class="bg-white rounded-[12px] overflow-hidden shadow-sm border border-[#E5E5EA] w-full">${c}</div>`,
+  inputRow:(label,field,placeholder,type="text",suffix="")=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white">
+      <span class="text-[16px] font-semibold text-black">${label}</span>
+      <div class="flex items-center gap-1">
+        <input type="${type}" oninput="updateData('${field}', this.value)" value="${formData[field]}" class="text-right text-[16px] text-[#8E8E93] font-medium outline-none w-40 placeholder:text-gray-300 bg-transparent" placeholder="${placeholder}">
+        ${suffix?`<span class="text-[#8E8E93] font-medium text-[15px]">${suffix}</span>`:''}
+      </div>
+    </div>`,
+  dateRow:(label,field)=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white">
+      <span class="text-[16px] font-semibold text-black">${label}</span>
+      <input type="date" onchange="updateBirthDate(this.value)" value="${formData[field]}" class="text-right text-[16px] text-[#8E8E93] font-medium outline-none bg-transparent">
+    </div>`,
+  textarea:(field,placeholder)=>`
+    <div class="bg-white rounded-[12px] p-5 shadow-sm border border-[#E5E5EA]">
+      <textarea oninput="updateData('${field}', this.value)" class="w-full h-24 outline-none resize-none text-[16px] font-medium text-black placeholder:text-gray-300 bg-transparent" placeholder="${placeholder}">${formData[field]}</textarea>
+    </div>`,
+  segmentedControl:(field,options)=>`
+    <div class="flex bg-[#F2F2F7] rounded-[9px] p-[3px] w-full">
+      ${options.map(opt=>`<button onclick="setSegmented('${field}', '${opt}', this)" class="flex-1 py-2 text-[14px] rounded-[7px] transition-all duration-200 ${formData[field]===opt?'font-bold bg-white shadow-[0_3px_8px_rgba(0,0,0,0.12)] text-black':'font-medium text-[#8E8E93]'}">${opt}</button>`).join('')}
+    </div>`,
+  switchRow:(label,field)=>`
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white cursor-pointer active:bg-gray-50 transition-colors">
+      <span class="text-[16px] font-semibold text-black">${label}</span>
+      <div class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" class="sr-only peer" onchange="updateData('${field}', this.checked)" ${formData[field]?'checked':''}>
+        <div class="w-14 h-[31px] bg-[#E9E9EA] rounded-full peer-checked:bg-[#FFCC00] transition-colors duration-300 relative">
+          <div class="absolute top-[2px] left-[2px] bg-white border border-gray-200 w-[27px] h-[27px] rounded-full shadow-[0_3px_8px_rgba(0,0,0,0.15)] transition-transform duration-300 peer-checked:translate-x-[25px]"></div>
+        </div>
+      </div>
+    </label>`,
+  checkRow:(label,category,value)=>`
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white cursor-pointer active:bg-gray-50 transition-colors">
+      <span class="text-[15px] font-semibold text-black">${label}</span>
+      <div class="relative flex items-center justify-center">
+        <input type="checkbox" class="sr-only peer" onchange="updateCheck('${category}', '${value}', this.checked)" ${formData[category].includes(value)?'checked':''}>
+        <i data-lucide="check" class="w-6 h-6 text-[#FFCC00] opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></i>
+      </div>
+    </label>`,
+  checkWithNote:(label,boolField,noteField,notePlaceholder)=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white gap-3">
+      <label class="flex items-center gap-3 cursor-pointer shrink-0">
+        <div class="relative flex items-center justify-center w-6 h-6">
+          <input type="checkbox" class="sr-only peer" onchange="updateData('${boolField}', this.checked)" ${formData[boolField]?'checked':''}>
+          <i data-lucide="check" class="w-6 h-6 text-[#FFCC00] opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></i>
+        </div>
+        <span class="text-[15px] font-semibold text-black">${label}</span>
+      </label>
+      <input type="text" oninput="updateData('${noteField}', this.value)" value="${formData[noteField]}" class="flex-1 text-right text-[14px] text-[#8E8E93] outline-none bg-transparent placeholder:text-gray-300" placeholder="${notePlaceholder}">
+    </div>`,
+  header:(t)=>`<h2 class="text-[26px] font-extrabold tracking-tight text-black mb-2 mt-8 px-2 first:mt-0">${t}</h2>`,
+  subhead:(t)=>`<div class="text-[13px] font-bold text-[#8E8E93] uppercase tracking-wider mb-2 mt-6 px-4">${t}</div>`
+};
+
+/* ===================== 4. 나이별 옵션 데이터 ===================== */
+function opt(ageGroup){
+  const old = ageGroup==='old';
+  return {
+    caregivers: old ? ['아빠','엄마','할머니/할아버지','형제/자매'] : ['아빠','엄마','할머니/할아버지','도우미','형제/자매'],
+    dietHabits: old
+      ? ['언제나 식사를 즐겨한다','식사 시간이 되면 그냥 먹는다','억지로 먹이기 힘들 정도로 안먹는다','편식이 있다','편식하지 않는다','과식하는 편이다','아침을 잘 챙겨먹지 않는다','육류를 즐겨먹는다','탄산음료를 즐겨먹는다','과자, 젤리, 빵을 많이 먹는다']
+      : ['언제나 식사를 즐겨한다','식사 시간이 되면 그냥 먹는다','억지로 먹이기 힘들 정도로 안먹는다','편식이 있다','편식하지 않는다','과식하는 편이다','아침을 잘 챙겨먹지 않는다','육류를 즐겨먹는다','탄산음료를 즐겨먹는다','과자, 사탕, 젤리, 케익, 빵을 많이 먹는다'],
+    emotionTraits: old
+      ? ['무서움을 많이 탄다','낯을 심하게 가리는 편이다','잘 우는 편이다','잘 흥분하는 편이다','고집이 센 편이다','우울하거나 불안해한다','너무 긴장이 심해 틱이나 다른 긴장 증상이 있다']
+      : ['무서움을 많이 탄다','낯을 심하게 가리는 편이다','잘 우는 편이다','잘 흥분하는 편이다','고집이 센 편이다'],
+    sysSpleen: old
+      ? ['안색이 누렇게 자주 뜬다','식욕이 별로 없어 자꾸 밥을 안먹으려고 하는 편이다','또래에 비해서 키가 작고 마른 편이다','배가 아프다고 하거나 멀미를 자주 한다','설사, 변비, 구토가 잦게 나타난다','혀의 설태가 벗겨져 지도처럼 보이고 입이 자주 헌다']
+      : ['안색이 누렇게 자주 뜬다','식욕이 별로 없어 자꾸 밥을 안먹으려고 하는 편이다','배가 아프다고 하거나 멀미를 자주 한다','설사, 변비, 구토가 잦게 나타난다','혀의 설태가 벗겨져 지도처럼 보이고 입이 자주 헌다']
+  };
+}
+const OPT_SOCIAL = ['친구와 잘 사귀는 편이다','혼자 놀기를 좋아한다','친구들과 트러블이 잦다','친구가 많다','평소에 짜증섞인 표현을 자주 한다'];
+const OPT_ANGER = ['말을 안한다','물건을 던진다','욕을 한다','혼자 도망간다'];
+const OPT_POTTY = ['대변을 가린다','대변을 가리지 못한다','소변을 가린다','소변을 가리지 못한다','밤에 소변 실수를 한다'];
+const OPT_STOOL = ['변이 무른편이다','항생제와 같은 양약을 복용하면 설사를 하는 편이다','변비가 있다','설사가 잦고 힘들어하는 편이다'];
+const OPT_HEALTH_PROMO = ['홍삼을 복용한 적이 있다','건강기능식품(비타민, 즙 등)을 복용중이다','독감 예방접종을 받은 경험이 있다','성장 주사를 맞는 중이다','건강기능식품 복용 도중 부작용이 나타난 적이 있다','양방 처치 도중 부작용을 경험한 적이 있다'];
+const OPT_ORIENTAL = ['보약을 복용한 적이 있다','치료를 목적으로 한약, 침치료를 받은 적이 있다'];
+const OPT_LIVER = ['쉽게 피로를 느끼고 다른 아이에 비해 잘 지친다','눈의 피로를 잘 느끼거나 시력이 좋지 않다','어지럼이나 두통을 가끔 호소한다','짜증이 많고 화를 자주 낸다','잘 넘어지거나 쉽게 삐끗하고, 자주 근육통이 있다','코피가 자주 난다'];
+const OPT_HEART = ['안색이 자주 창백해 진다','가슴이 두근거리거나 답답하다는 말을 자주 한다','깊은 잠을 못자고 자주 깨거나, 운다','다른 아이보다 유독 깜짝 놀라는 경우가 많다','특정 부위로 땀을 자주 흘린다','주의가 산만하고 집중을 잘 못한다'];
+const OPT_LUNG = ['감기에 자주 걸리고, 약을 먹어도 잘 낫지 않는다(1주일이상 약 복용)','감기가 아닌데도 기침, 가래, 콧물이 잦은 편이다','온도 변화에 민감해 추위 더위에 쉽게 지친다','알레르기 비염, 천식 또는 편도, 아데노이드가 크다는 진단을 받은 적이 있다','감기가 심해져 입원한 적(폐렴, 기관지염)이 있다'];
+const OPT_KIDNEY = ['눈 주위가 쉽게 붓거나 다크써클이 자주 생긴다','소변색이 유난히 짙거나, 냄새가 심하거나, 소변볼 때 아파한다','머리카락 숱이 적거나 윤기가 없고 힘이 없다','방광염, 신증, 신우신염 등 치료받은 적이 있다','척추측만증 또는 만성요통, 무릎통증이 있다'];
+const OPT_ANXIETY = [
+  '학교나 학원 가는 것을 유독 힘들어한다',
+  '새로운 상황이나 낯선 자리에서 긴장을 많이 한다',
+  '사소한 일에도 걱정을 자주 한다',
+  '시험이나 발표 전에 배가 아프거나 잠을 설친다',
+  '실수하는 것을 지나치게 두려워한다',
+  '부모와 떨어지는 것을 유난히 불안해한다',
+  '손톱을 물어뜯거나 손을 자주 만지작거리는 습관이 있다',
+  '잠들기까지 오래 걸리거나 자주 뒤척인다',
+  '또래보다 자신감이 없어 보인다는 말을 듣는다',
+  '몸이 아프지 않은데도 두통이나 복통을 자주 호소한다'
+];
+
+/* ===================== 5. 단계별 컨텐츠 ===================== */
+const sections = {
+  2:{ navTitle:'기본 정보', html:()=>{
+    const old = getAgeGroup()==='old';
+    return `
+    ${UI.header('아이 정보')}
+    ${UI.group(`
+      ${UI.inputRow('이름','name','이름 입력')}
+      <div class="p-4 px-5 border-b border-[#E5E5EA] bg-white">${UI.segmentedControl('gender',['남아','여아'])}</div>
+      ${UI.dateRow('생년월일','birthDate')}
+      ${UI.inputRow('체중','weight','0','number','kg')}
+      ${UI.inputRow('키','height','0','number','cm')}
+    `)}
+    ${UI.subhead('건강 상태')}
+    ${UI.group(`
+      <div class="p-4 px-5 border-b border-[#E5E5EA] bg-white">${UI.segmentedControl('healthStatus',['건강한 편','보통','허약하다'])}</div>
+      ${UI.switchRow('감기에 자주 걸린다','frequentColds')}
+      ${UI.switchRow('최근 갑자기 허약해진 느낌이다','suddenWeakness')}
+    `)}
+    ${UI.subhead('가장 불편한 증상')}
+    ${UI.textarea('chiefComplaint','어디가 불편해서 오셨나요?')}
+    ${old ? `
+      ${UI.subhead('건강증진 및 예방 관련')}
+      ${UI.group(OPT_HEALTH_PROMO.map(v=>UI.checkRow(v,'healthPromotion',v)).join(''))}
+      ${UI.subhead('한의원에서')}
+      ${UI.group(OPT_ORIENTAL.map(v=>UI.checkRow(v,'orientalTreatment',v)).join(''))}
+    ` : `
+      ${UI.subhead('출생 관련')}
+      ${UI.group(`
+        ${UI.inputRow('출생 시 체중','birthWeight','0','number','kg')}
+        <div class="p-4 px-5 border-b border-[#E5E5EA] bg-white">${UI.segmentedControl('deliveryType',['자연분만','제왕절개'])}</div>
+        ${UI.switchRow('출생 직후 황달, 감염이 있었다','jaundiceInfection')}
+        ${UI.inputRow('모유수유 총 개월','breastFeedingMonth','0','number','개월')}
+        ${UI.inputRow('임신 중 모친 질환','momPregnancyIllness','없음')}
+      `)}
+    `}`;
+  }},
+  3:{ navTitle:'생활 환경', html:()=>{
+    const g = getAgeGroup(); const old = g==='old'; const o = opt(g);
+    return `
+    ${UI.header('생활 환경')}
+    ${UI.subhead('자녀와 함께 생활하는 사람 (다중 선택)')}
+    ${UI.group(o.caregivers.map(v=>UI.checkRow(v,'caregivers',v)).join(''))}
+    ${UI.group(UI.inputRow('기타','caregiversOther','직접 입력'))}
+    ${old ? `
+      ${UI.subhead('자녀와 함께 지내는 시간')}
+      ${UI.group(`
+        ${UI.inputRow('평균 시간','withParentTime','예: 2시간/일')}
+        ${UI.inputRow('주로 지내는 사람','withParentPerson','누구와 주로 지내나요?')}
+      `)}
+    ` : `
+      ${UI.subhead('놀이 환경')}
+      ${UI.group(`
+        ${UI.inputRow('주로 놀아주는 사람','mainPlaymate','누구와 주로 노나요?')}
+        ${UI.inputRow('하루 평균 놀이 시간','playTimeAvg','0','number','시간')}
+      `)}
+      ${UI.subhead('가족 중 가장 좋아하는 사람')}
+      ${UI.group(UI.inputRow('좋아하는 사람','favoritePerson','이름 또는 관계'))}
+    `}
+    ${UI.subhead('교육(양육) 방식')}
+    ${UI.group(`
+      <div class="p-4 px-5 border-b border-[#E5E5EA] bg-white">${UI.segmentedControl('parentingStyle',['자유로운 편','엄격한 편','기타'])}</div>
+      ${UI.inputRow('기타 상세','parentingStyleOther','해당 시 입력')}
+    `)}
+    ${!old ? `
+      ${UI.subhead('대소변 습관')}
+      ${UI.group(OPT_POTTY.map(v=>UI.checkRow(v,'potty',v)).join(''))}
+      ${UI.subhead('변 상태')}
+      ${UI.group(`
+        ${OPT_STOOL.map(v=>UI.checkRow(v,'stoolStatus',v)).join('')}
+        ${UI.inputRow('일주일 평균 대변 횟수','stoolFreq','0','number','회/주')}
+      `)}
+    ` : ``}`;
+  }},
+  4:{ navTitle:'생활 습관', html:()=>{
+    const g = getAgeGroup(); const old = g==='old'; const o = opt(g);
+    return `
+    ${UI.header('생활 습관')}
+    ${UI.subhead('식사습관 (다중 선택)')}
+    ${UI.group(o.dietHabits.map(v=>UI.checkRow(v,'dietHabits',v)).join(''))}
+    ${UI.group(UI.inputRow('알레르기 유발 음식','allergyFood','없음'))}
+
+    ${UI.subhead('수면습관')}
+    ${UI.group(`
+      <div class="p-4 px-5 border-b border-[#E5E5EA] bg-white">${UI.segmentedControl('sleepAlone',['혼자 잔다','부모와 함께 잔다'])}</div>
+      ${UI.switchRow('잠자리 시간이 11시 이후이다','sleepLate11')}
+      ${!old ? `
+        ${UI.inputRow('낮잠 — 하루 횟수','napFreq','0','number','회')}
+        ${UI.inputRow('낮잠 — 시간','napHours','0','number','시간')}
+      ` : ``}
+      ${UI.switchRow('밤에 자다가 자주 깬다','wakesAtNight')}
+      ${old ? UI.switchRow('잠자기 직전까지 스마트폰을 본다','phoneBeforeSleep') : ``}
+    `)}
+
+    ${UI.subhead('사회성')}
+    ${UI.group(OPT_SOCIAL.map(v=>UI.checkRow(v,'socialTraits',v)).join(''))}
+    ${UI.group(UI.inputRow(old?'스마트폰/컴퓨터 사용 시간':'TV/스마트폰 시청 시간','screenTimeHours','0','number','시간/일'))}
+
+    ${UI.subhead('정서 (다중 선택)')}
+    ${UI.group(o.emotionTraits.map(v=>UI.checkRow(v,'emotionTraits',v)).join(''))}
+    ${UI.subhead('화가 나면')}
+    ${UI.group(OPT_ANGER.map(v=>UI.checkRow(v,'angerResponse',v)).join(''))}
+    ${UI.group(UI.inputRow('기타 정서 변화','angerOther','있다면 입력'))}
+
+    ${UI.subhead('놀이')}
+    ${UI.group(`
+      ${UI.inputRow('활동적인 놀이','playActive','예: 축구, 술래잡기')}
+      ${UI.inputRow('조용하고 정적인 놀이','playQuiet','예: 그림그리기')}
+      ${UI.inputRow('실내 놀이','playIndoor','예: 블록')}
+      ${UI.inputRow('야외 놀이','playOutdoor','예: 자전거')}
+      ${UI.inputRow('특별히 자주 하는 놀이','playSpecial','있다면 입력')}
+      ${UI.inputRow('하루 평균 아빠와 노는 시간','playWithDadHours','0','number','시간/일')}
+      ${UI.inputRow('순수 야외활동 횟수','outdoorActivityPerMonth','0','number','회/월')}
+      ${UI.inputRow('가족 모두 참여 야외활동','familyOutdoorPerMonth','0','number','회/월')}
+    `)}
+
+    ${UI.subhead('교육 활동')}
+    ${UI.group(`
+      ${UI.checkWithNote('영어','eduEnglish','eduEnglishNote','예: 주 3회')}
+      ${UI.checkWithNote('미술','eduArt','eduArtNote','예: 주 1회')}
+      ${UI.checkWithNote('음악','eduMusic','eduMusicNote','예: 피아노')}
+      ${UI.checkWithNote('방문교육','eduHomeVisit','eduHomeVisitNote','과목')}
+      ${UI.inputRow('운동 (종류)','eduExerciseType','예: 태권도, 수영')}
+      ${UI.inputRow('기타','eduOther','있다면 입력')}
+      ${!old
+        ? UI.inputRow('어린이집/놀이학교/학원/유치원 하루 평균 시간','institutionHours','0','number','시간/일')
+        : UI.inputRow('일주일 과외(학원) 종류 수','weeklyPrivateEduCount','0','number','종류/주')}
+    `)}`;
+  }},
+  5:{ navTitle:'건강 체크', html:()=>{
+    const g = getAgeGroup(); const old = g==='old'; const o = opt(g);
+    return `
+    ${UI.header('의학적 정보')}
+    ${UI.subhead('질병 병력')}
+    ${UI.group(`
+      ${UI.switchRow('지금까지 수술을 받은 적이 있다','surgeryHistory')}
+      ${UI.switchRow('지금까지 입원을 한 적이 있다','hospitalHistory')}
+      ${UI.inputRow('유전적 질환','geneticDisease','없음')}
+      ${UI.inputRow('기타 알고 있어야 하는 부분','otherMedicalNote','있다면 입력')}
+    `)}
+    ${UI.subhead('특이체질')}
+    ${UI.group(['아토피 피부염','천식 증상'].map(v=>UI.checkRow(v,'specialConstitution',v)).join(''))}
+    ${UI.group(UI.inputRow('알레르기, 기타(종류)','allergyOtherType','있다면 입력'))}
+    ${!old ? `
+      ${UI.subhead('가정 의료')}
+      ${UI.group(`
+        ${UI.inputRow('열이 날 때 먹이는 약','feverMedicine','약 이름')}
+        ${UI.inputRow('열날 때 기타 대응','feverOtherResponse','예: 미온수 마사지')}
+        ${UI.inputRow('체하거나 설사할 때 먹이는 약','indigestionMedicine','약 이름')}
+        ${UI.inputRow('그때 기타 대응','indigestionOtherResponse','예: 소화제, 죽')}
+      `)}
+    ` : ``}
+
+    ${UI.header('오장육부 계통 문진')}
+    ${UI.subhead('간(肝) 기능 계통')}
+    ${UI.group(OPT_LIVER.map(v=>UI.checkRow(v,'sysLiver',v)).join(''))}
+    ${UI.subhead('심(心) 기능 계통')}
+    ${UI.group(OPT_HEART.map(v=>UI.checkRow(v,'sysHeart',v)).join(''))}
+    ${UI.subhead('비(脾) 기능 계통')}
+    ${UI.group(o.sysSpleen.map(v=>UI.checkRow(v,'sysSpleen',v)).join(''))}
+    ${UI.subhead('폐(肺) 기능 계통')}
+    ${UI.group(OPT_LUNG.map(v=>UI.checkRow(v,'sysLung',v)).join(''))}
+    ${UI.subhead('신(腎) 기능 계통')}
+    ${UI.group(OPT_KIDNEY.map(v=>UI.checkRow(v,'sysKidney',v)).join(''))}
+
+    ${UI.header('마무리')}
+    ${UI.group(UI.inputRow('보호자 성함','guardianName','이름 입력'))}
+    <p class="text-[13px] font-medium text-[#8E8E93] text-center mt-6">입력하신 정보는 안전하게 보호되며 진료 목적으로만 사용됩니다.</p>`;
+  }},
+  6:{ navTitle:'정서 · 불안 체크', html:()=>`
+    ${UI.header('정서 · 불안 체크리스트')}
+    <p class="text-[14px] text-[#3C3C43] leading-[21px] px-2 mb-4">
+      이제부터는 <b>아이가 직접</b> 하나씩 읽고, 나에게 맞는다고 생각되면 체크해 주세요. 정답은 없으니 평소 느끼는 대로 답하면 됩니다.
+    </p>
+    ${UI.subhead('아래 항목 중 나에게 맞는 것을 모두 골라주세요')}
+    ${UI.group(OPT_ANXIETY.map(v=>UI.checkRow(v,'anxietyChecklist',v)).join(''))}
+    <p class="text-[12px] font-medium text-[#8E8E93] text-center mt-6">이 체크리스트는 정식 심리검사가 아닌 예비 선별용입니다.</p>`
+  }
+};
+
+/* ===================== 6. 진행 · 네비게이션 ===================== */
+function renderProgress(){
+  const fill=document.getElementById('progress-fill');
+  const total=getTotalSteps();
+  const pct = currentStep<=1 ? 0 : ((currentStep-1)/total)*100;
+  fill.style.width=pct+'%';
+}
+function refreshStep(){
+  if(currentStep===1) return;
+  const container=document.getElementById('dynamic-container');
+  container.innerHTML = sections[currentStep].html();
+  if(window.lucide) lucide.createIcons();
+  renderProgress();
+}
+window.updateUI = function(){
+  const container=document.getElementById('dynamic-container');
+  container.classList.remove('animate-fade-in'); void container.offsetWidth; container.classList.add('animate-fade-in');
+  document.querySelectorAll('.step-content').forEach(s=>s.classList.remove('active'));
+  const bottomAction=document.getElementById('bottom-action'), nextBtn=document.getElementById('next-btn'),
+        backBtn=document.getElementById('btn-back'), navTitle=document.getElementById('nav-title'),
+        scrollContainer=document.getElementById('scroll-container');
+  if(currentStep===1){
+    document.getElementById('step-1').classList.add('active');
+    bottomAction.classList.add('hidden'); backBtn.classList.add('hidden'); navTitle.innerText='소개';
+  } else {
+    const config=sections[currentStep];
+    container.innerHTML=config.html(); container.classList.add('active');
+    bottomAction.classList.remove('hidden'); backBtn.classList.remove('hidden'); navTitle.innerText=config.navTitle;
+    nextBtn.innerText = (currentStep===getTotalSteps()) ? '완료 및 리포트 생성' : '다음 단계';
+  }
+  renderProgress(); if(window.lucide) lucide.createIcons();
+  if(scrollContainer) scrollContainer.scrollTo(0,0);
+};
+window.nextStep=function(){ if(currentStep<getTotalSteps()){ currentStep++; updateUI(); } else { generateReportAndShow(); } };
+window.prevStep=function(){ if(currentStep>1){ currentStep--; updateUI(); } };
+window.backToForm=function(){
+  document.title='해온한의원 소아(청소년)과 문진표';
+  document.getElementById('report-view').classList.remove('active');
+  if(cameFromSearch){
+    cameFromSearch=false;
+    document.getElementById('search-view').style.display='block';
+  } else {
+    document.getElementById('app-shell').style.display='flex';
+    currentStep=getTotalSteps(); updateUI();
+  }
+};
+window.resetAll=function(){ if(confirm('모든 입력 내용이 초기화됩니다. 계속하시겠습니까?')) window.location.reload(); };
+
+/* ===================== 저장 / 검색 (Google Sheet) ===================== */
+function isSheetConfigured(){ return CONFIG.SHEET_URL && CONFIG.SHEET_URL.trim().length > 0; }
+
+function saveRecordToSheet(){
+  const statusEl = document.getElementById('save-status');
+  if(!isSheetConfigured()){
+    if(statusEl) statusEl.innerText = '저장소 미설정 (검색 기능을 쓰려면 CONFIG.SHEET_URL 설정 필요)';
+    return;
+  }
+  if(statusEl) statusEl.innerText = '저장 중...';
+  const payload = { name: formData.name, birthDate: formData.birthDate, gender: formData.gender, ageGroup: getAgeGroup(), formData: formData };
+  fetch(CONFIG.SHEET_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
+    .then(()=>{ if(statusEl) statusEl.innerText = '저장 완료 ✓'; })
+    .catch(()=>{ if(statusEl) statusEl.innerText = '저장 실패 - 네트워크를 확인해 주세요'; });
+}
+
+window.openSearchView = function(){
+  if(!isSheetConfigured()){
+    alert('아직 검색 저장소(Google Sheet)가 설정되지 않았습니다. CONFIG.SHEET_URL 을 설정한 뒤 사용해 주세요.');
+    return;
+  }
+  document.getElementById('app-shell').style.display='none';
+  document.getElementById('search-view').style.display='block';
+  document.getElementById('search-input').value='';
+  document.getElementById('search-results').innerHTML='';
+  document.getElementById('search-status').innerText='';
+};
+window.closeSearchView = function(){
+  document.getElementById('search-view').style.display='none';
+  document.getElementById('app-shell').style.display='flex';
+};
+
+window.searchRecords = function(query){
+  const statusEl=document.getElementById('search-status'), resultsEl=document.getElementById('search-results');
+  statusEl.innerText='검색 중...'; resultsEl.innerHTML='';
+  fetch(`${CONFIG.SHEET_URL}?q=${encodeURIComponent(query||'')}`)
+    .then(r=>r.json())
+    .then(json=>{
+      if(!json.ok || !json.results || !json.results.length){
+        statusEl.innerText='검색 결과가 없습니다.';
+        return;
+      }
+      statusEl.innerText=`${json.results.length}건 찾음`;
+      resultsEl.innerHTML = json.results.map((rec,i)=>{
+        const d = new Date(rec.ts);
+        const dateLabel = isNaN(d) ? '' : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        return `<button onclick='loadRecordAndShowReport(${i})' class="text-left bg-white border border-[#E5E5EA] rounded-[12px] p-4 flex justify-between items-center active:bg-gray-50">
+          <div><div class="font-bold text-[16px] text-black">${rec.name||'이름 미상'}</div><div class="text-[12px] text-[#8E8E93]">${rec.birthDate||''} · ${rec.gender||''}</div></div>
+          <div class="text-[12px] text-[#8E8E93]">${dateLabel}</div>
+        </button>`;
+      }).join('');
+      window._searchResults = json.results;
+    })
+    .catch(()=>{ statusEl.innerText='검색 중 오류가 발생했습니다.'; });
+};
+
+window.loadRecordAndShowReport = function(idx){
+  const rec = window._searchResults[idx];
+  if(!rec) return;
+  let parsed;
+  try{ parsed = JSON.parse(rec.data); }catch(e){ alert('저장된 데이터를 불러오지 못했습니다.'); return; }
+  Object.assign(formData, parsed);
+  cameFromSearch = true;
+  document.getElementById('search-view').style.display='none';
+  generateReportAndShow(true);
+};
+
+/* ===================== 7. 한의학 분석 (오장/기혈수) ===================== */
+function ratio(list,total){ return Math.min(1, list.length/total); }
+function healthScore(list,total){ return Math.max(8, Math.round(100 - ratio(list,total)*90)); }
+function statusOf(score){
+  if(score>=70) return {label:'좋음',color:'#16a34a'};
+  if(score>=40) return {label:'보통',color:'#d97706'};
+  return {label:'관찰필요',color:'#dc2626'};
+}
+function calcOrganHealth(){
+  const f=formData, spleenTotal = opt(getAgeGroup()).sysSpleen.length;
+  return {
+    '간': healthScore(f.sysLiver, OPT_LIVER.length),
+    '심': healthScore(f.sysHeart, OPT_HEART.length),
+    '비': healthScore(f.sysSpleen, spleenTotal),
+    '폐': healthScore(f.sysLung, OPT_LUNG.length),
+    '신': healthScore(f.sysKidney, OPT_KIDNEY.length)
+  };
+}
+function calcQiHyeolSu(organ){
+  const f=formData;
+  const sleepIssue = ((f.wakesAtNight?1:0)+(f.sleepLate11?1:0))/2;
+  const sleepScore = Math.max(8, Math.round(100 - sleepIssue*90));
+  return {
+    '기': Math.round((organ['비']+organ['폐'])/2),
+    '혈': Math.round((organ['간']+organ['심'])/2),
+    '수': Math.round((organ['신']+sleepScore)/2)
+  };
+}
+const ORGAN_MODERN = {'간':'피로회복력 · 예민도','심':'정서안정 · 수면의 질','비':'소화흡수 · 식욕','폐':'호흡기 면역력','신':'성장 · 비뇨계 기초체력'};
+const QHS_MODERN = {'기':'에너지 · 활력','혈':'혈액순환 · 영양공급','수':'수분대사 · 회복력'};
+
+function drawRadar(data, containerId){
+  const keys=Object.keys(data); const size=220, center=size/2, radius=center*0.6, n=keys.length;
+  let svg=`<svg width="${size}" height="${size}" class="overflow-visible">`;
+  [0.25,0.5,0.75,1].forEach(lvl=>{
+    const pts=keys.map((_,i)=>{ const a=(Math.PI*2*i)/n - Math.PI/2; const r=lvl*radius; return `${center+r*Math.cos(a)},${center+r*Math.sin(a)}`; }).join(' ');
+    svg+=`<polygon points="${pts}" fill="none" stroke="#E5E5EA" stroke-width="1.2"/>`;
+  });
+  keys.forEach((_,i)=>{ const a=(Math.PI*2*i)/n - Math.PI/2; svg+=`<line x1="${center}" y1="${center}" x2="${center+radius*Math.cos(a)}" y2="${center+radius*Math.sin(a)}" stroke="#E5E5EA" stroke-width="1.2"/>`; });
+  const dPts=keys.map((k,i)=>{ const a=(Math.PI*2*i)/n - Math.PI/2; const r=(data[k]/100)*radius; return `${center+r*Math.cos(a)},${center+r*Math.sin(a)}`; }).join(' ');
+  svg+=`<polygon points="${dPts}" fill="rgba(255,204,0,0.32)" stroke="#C79000" stroke-width="2.5" stroke-linejoin="round"/>`;
+  keys.forEach((k,i)=>{ const a=(Math.PI*2*i)/n - Math.PI/2; const r=radius+20; svg+=`<text x="${center+r*Math.cos(a)}" y="${center+r*Math.sin(a)}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#8E8E93">${k}</text>`; });
+  svg+='</svg>';
+  document.getElementById(containerId).innerHTML=svg;
+}
+function renderLegend(containerId, data, modernMap){
+  const html=Object.entries(data).map(([k,v])=>{
+    const st=statusOf(v);
+    return `<div class="rp-organ-row"><span><span class="rp-status-dot" style="background:${st.color}"></span><b>${k}</b> · ${modernMap[k]}</span><span style="color:${st.color};font-weight:700">${st.label}</span></div>`;
+  }).join('');
+  document.getElementById(containerId).innerHTML=html;
+}
+
+/* ===================== 8. 성장 백분위 참조 데이터 ===================== */
+const growthReferenceData = {
+  male:{ ages:[2,4,6,8,10,12,14,16,18],
+    height:{p3:[82.5,95.8,107.3,118.8,129.8,139.7,152.8,164.0,167.2],p10:[84.5,98.2,110.2,121.7,133.0,143.3,156.4,167.0,169.8],p25:[86.0,100.7,113.0,124.5,136.0,146.5,160.0,170.0,172.4],p50:[87.8,103.2,115.5,127.5,138.8,149.8,163.5,172.0,174.2],p75:[89.7,105.7,118.0,130.3,142.0,153.3,167.0,174.0,176.5],p90:[91.2,107.8,120.5,133.0,145.0,156.0,170.0,177.0,179.5],p97:[93.0,110.0,123.0,136.0,148.0,159.0,173.0,180.0,182.5]},
+    weight:{p3:[10.2,13.1,16.3,20.2,24.8,31.2,40.3,49.7,53.2],p10:[10.9,14.1,17.8,22.0,27.3,34.5,44.5,53.8,57.0],p25:[11.6,15.2,19.2,24.1,30.2,38.5,49.0,58.5,61.5],p50:[12.4,16.5,21.0,27.0,34.5,45.0,56.0,63.0,66.0],p75:[13.4,18.0,23.5,30.5,39.5,51.8,63.5,69.8,73.5],p90:[14.4,19.7,26.0,34.0,44.8,58.5,69.0,76.0,80.5],p97:[15.2,21.2,28.5,37.8,49.5,64.5,74.8,82.0,87.0]}},
+  female:{ ages:[2,4,6,8,10,12,14,16,18],
+    height:{p3:[81.5,95.0,106.8,118.0,129.5,142.8,150.8,152.0,152.3],p10:[83.5,97.2,109.5,121.0,132.8,146.2,153.5,154.8,155.2],p25:[85.0,99.5,112.0,123.8,136.0,149.2,156.0,157.8,158.2],p50:[87.0,102.0,115.0,126.8,139.0,152.0,159.5,161.3,161.8],p75:[88.8,104.5,117.5,129.8,142.0,154.8,162.0,163.8,164.2],p90:[90.5,106.8,120.0,132.5,145.0,157.0,164.2,165.8,166.0],p97:[92.0,109.0,122.5,135.0,148.0,159.2,166.0,167.3,167.8]},
+    weight:{p3:[9.8,12.8,16.0,20.2,25.5,33.5,41.8,45.3,46.0],p10:[10.5,13.9,17.5,22.2,28.3,36.8,45.0,48.5,49.0],p25:[11.2,15.0,19.0,24.6,31.8,40.8,48.5,52.2,53.0],p50:[12.0,16.2,20.8,26.8,34.2,46.0,53.5,56.5,57.3],p75:[13.1,17.8,23.2,30.8,39.8,52.8,59.5,62.2,63.0],p90:[14.1,19.5,25.8,34.5,44.8,58.8,64.5,68.0,69.0],p97:[15.0,21.0,28.0,38.2,49.5,64.5,69.8,74.0,75.0]}}
+};
+function interpolateAtAge(x,xs,ys){ if(x<=xs[0]) return ys[0]; if(x>=xs[xs.length-1]) return ys[ys.length-1]; let i=0; while(x>xs[i+1]) i++; const t=(x-xs[i])/(xs[i+1]-xs[i]); return ys[i]*(1-t)+ys[i+1]*t; }
+function calcPercentile(value, refAtAge){
+  const levels=[3,10,25,50,75,90,97], keys=['p3','p10','p25','p50','p75','p90','p97'];
+  for(let i=0;i<keys.length-1;i++){ const a=refAtAge[keys[i]], b=refAtAge[keys[i+1]]; if(value>=a && value<=b){ const t=(value-a)/((b-a)||1); return +(levels[i]+t*(levels[i+1]-levels[i])).toFixed(1); } }
+  if(value<refAtAge.p3) return 1.0; if(value>refAtAge.p97) return 99.0; return 50.0;
+}
+function getHeightComment(p){ if(p>=90) return '또래 대비 매우 큰 편입니다.'; if(p>=75) return '또래 대비 큰 편입니다.'; if(p>=25) return '또래 평균 범위입니다.'; if(p>=10) return '또래 대비 작은 편입니다.'; return '또래 대비 매우 작은 편으로, 성장 경과 관찰이 필요합니다.'; }
+function getWeightComment(p){ if(p>=90) return '체중이 또래보다 매우 높은 편입니다.'; if(p>=75) return '체중이 또래보다 높은 편입니다.'; if(p>=25) return '체중은 평균 범위입니다.'; if(p>=10) return '체중이 또래보다 낮은 편입니다.'; return '체중이 또래보다 매우 낮은 편으로, 식습관 관리가 필요합니다.'; }
+
+let rpHeightChart, rpWeightChart;
+function drawGrowthChart(canvasId, ref, ageLabels, dataKey, age, value, pointColor){
+  const ctx=document.getElementById(canvasId).getContext('2d');
+  const styles={p3:{c:'#e2e8f0',w:1,d:[2,2]},p10:{c:'#cbd5e1',w:1,d:[3,3]},p25:{c:'#94a3b8',w:1,d:[4,3]},p50:{c:'#334155',w:1.8,d:[]},p75:{c:'#94a3b8',w:1,d:[4,3]},p90:{c:'#cbd5e1',w:1,d:[3,3]},p97:{c:'#e2e8f0',w:1,d:[2,2]}};
+  const datasets=['p3','p10','p25','p50','p75','p90','p97'].map(k=>({label:k.replace('p','')+'th',data:ref[dataKey][k],borderColor:styles[k].c,borderWidth:styles[k].w,borderDash:styles[k].d,pointRadius:0,tension:.35}));
+  datasets.push({label:'우리 아이',data:[{x:age,y:value}],type:'scatter',backgroundColor:pointColor,borderColor:pointColor,pointRadius:5,pointHoverRadius:6});
+  return new Chart(ctx,{type:'line',data:{labels:ageLabels,datasets},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:6,padding:6,font:{size:8}}}},
+    scales:{x:{type:'linear',min:2,max:18,grid:{display:false},ticks:{font:{size:8}}},y:{grid:{color:'#f1f5f9'},ticks:{font:{size:8}}}}}});
+}
+
+/* ===================== 9. 리포트 생성 ===================== */
+function generateReportAndShow(skipSave){
+  const f=formData, ageGroup=getAgeGroup(), isOld=ageGroup==='old', todayStr=new Date().toLocaleDateString('ko-KR');
+  let ageYears=getAgeYears(), ageLabel='미입력';
+  if(ageYears!==null){
+    const b=new Date(f.birthDate), t=new Date(); const ms=t-b; const exact=ms/(1000*60*60*24*365.25);
+    const y=Math.floor(exact), m=Math.floor((exact-y)*12);
+    ageLabel=`${f.gender} · 만 ${y}세 ${m}개월`;
+  }
+
+  // 인쇄/PDF 저장 시 파일명 = 이름_생년월일_날짜 (브라우저가 문서 제목을 기본 파일명으로 사용)
+  const compactDate = (d) => { const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`; };
+  const birthCompact = f.birthDate ? f.birthDate.replaceAll('-','') : '생년월일미상';
+  const nameForFile = (f.name || '이름미상').trim().replace(/\s+/g,'');
+  document.title = `${nameForFile}_${birthCompact}_${compactDate(new Date())}`;
+
+  document.getElementById('rp-name').innerText=f.name||'미입력';
+  document.getElementById('rp-age').innerText=ageLabel;
+  document.getElementById('rp-body').innerText=`${f.height||'0'}cm / ${f.weight||'0'}kg`;
+  document.getElementById('rp-guardian').innerText=f.guardianName||'미입력';
+  document.getElementById('rp-date').innerText=todayStr;
+  document.getElementById('rp-complaint').innerText=f.chiefComplaint||'특이 호소 증상 없음';
+  document.getElementById('rp-footer-1').innerText=`측정일: ${todayStr}`;
+  document.getElementById('rp-footer-2').innerText=`측정일: ${todayStr}`;
+  document.getElementById('rp-footer-3').innerText=`측정일: ${todayStr}`;
+
+  // 페이지 배지 & 3페이지 표시 여부
+  document.getElementById('rp-badge-1').innerText = isOld ? '1 / 3' : '1 / 2';
+  document.getElementById('rp-badge-2').innerText = isOld ? '2 / 3' : '2 / 2';
+  document.getElementById('rp-page-3').style.display = isOld ? 'flex' : 'none';
+
+  // 오장 · 기혈수
+  const organ=calcOrganHealth(); const qhs=calcQiHyeolSu(organ);
+  drawRadar(organ,'rp-radar'); drawRadar(qhs,'rp-qhs-radar');
+  renderLegend('rp-organ-legend', organ, ORGAN_MODERN);
+  renderLegend('rp-qhs-legend', qhs, QHS_MODERN);
+
+  const weakestOrgan=Object.entries(organ).sort((a,b)=>a[1]-b[1])[0];
+  const weakestQhs=Object.entries(qhs).sort((a,b)=>a[1]-b[1])[0];
+  const growthText = `현재 아이는 오장 중 <b>${weakestOrgan[0]}(${ORGAN_MODERN[weakestOrgan[0]]})</b> 관련 신호가, 기혈수 중에서는 <b>${weakestQhs[0]}(${QHS_MODERN[weakestQhs[0]]})</b> 영역이 또래 대비 상대적으로 약한 편으로 나타났습니다. `
+    + `쉽게 말해 ${weakestOrgan[0]==='간'?'쉽게 예민해지거나 피로가 잘 회복되지 않는 경향':weakestOrgan[0]==='심'?'정서적으로 불안정하거나 잠을 깊이 못 자는 경향':weakestOrgan[0]==='비'?'소화흡수력이 약해 잘 못 먹거나 살이 잘 안 붙는 경향':weakestOrgan[0]==='폐'?'감기·비염 등 호흡기 쪽에 취약한 경향':'성장·비뇨기계 기초 체력이 다소 약한 경향'}이 있을 수 있어, 진료실에서 이 부분을 중심으로 체질에 맞는 관리 계획을 세워드리겠습니다.`;
+  document.getElementById('rp-growth-diagnosis').innerHTML=growthText;
+
+  // 성장 백분위
+  const genderKey = f.gender==='여아' ? 'female' : 'male';
+  const ref = growthReferenceData[genderKey];
+  const height=parseFloat(f.height)||0, weight=parseFloat(f.weight)||0;
+  const ageForChart = ageYears!==null ? Math.min(Math.max(ageYears,2),18) : 6;
+  const rH={p3:interpolateAtAge(ageForChart,ref.ages,ref.height.p3),p10:interpolateAtAge(ageForChart,ref.ages,ref.height.p10),p25:interpolateAtAge(ageForChart,ref.ages,ref.height.p25),p50:interpolateAtAge(ageForChart,ref.ages,ref.height.p50),p75:interpolateAtAge(ageForChart,ref.ages,ref.height.p75),p90:interpolateAtAge(ageForChart,ref.ages,ref.height.p90),p97:interpolateAtAge(ageForChart,ref.ages,ref.height.p97)};
+  const rW={p3:interpolateAtAge(ageForChart,ref.ages,ref.weight.p3),p10:interpolateAtAge(ageForChart,ref.ages,ref.weight.p10),p25:interpolateAtAge(ageForChart,ref.ages,ref.weight.p25),p50:interpolateAtAge(ageForChart,ref.ages,ref.weight.p50),p75:interpolateAtAge(ageForChart,ref.ages,ref.weight.p75),p90:interpolateAtAge(ageForChart,ref.ages,ref.weight.p90),p97:interpolateAtAge(ageForChart,ref.ages,ref.weight.p97)};
+  const pctH = height?calcPercentile(height,rH):50, pctW = weight?calcPercentile(weight,rW):50;
+  document.getElementById('rp-height-comment').innerText = height?`${height}cm · 약 ${pctH}th 백분위 · ${getHeightComment(pctH)}`:'키 정보 미입력';
+  document.getElementById('rp-weight-comment').innerText = weight?`${weight}kg · 약 ${pctW}th 백분위 · ${getWeightComment(pctW)}`:'체중 정보 미입력';
+  if(rpHeightChart) rpHeightChart.destroy(); if(rpWeightChart) rpWeightChart.destroy();
+  rpHeightChart = drawGrowthChart('rp-height-chart', ref, ref.ages, 'height', ageForChart, height||rH.p50, '#0284c7');
+  rpWeightChart = drawGrowthChart('rp-weight-chart', ref, ref.ages, 'weight', ageForChart, weight||rW.p50, '#059669');
+
+  const bmi = (height&&weight) ? (weight/((height/100)*(height/100))) : null;
+  let bmiText='BMI를 계산하려면 키와 체중을 입력해 주세요.';
+  if(bmi){
+    let status='정상 범위'; if(bmi<15) status='저체중 경향'; else if(bmi>21) status='과체중 경향';
+    bmiText=`BMI ${bmi.toFixed(1)} · ${status}. 키 백분위(${pctH}th)와 체중 백분위(${pctW}th)를 함께 고려하면, ${pctH>pctW+15?'체중 대비 마른 체형':pctW>pctH+15?'키 대비 체중이 많이 나가는 체형':'키와 체중의 균형이 잡힌 체형'}으로 판단됩니다.`;
+  }
+  document.getElementById('rp-bmi-summary').innerText=bmiText;
+
+  const lifestyleLines=[];
+  if(f.sleepAlone) lifestyleLines.push(`수면: ${f.sleepAlone}${f.sleepLate11?' · 취침 11시 이후':''}${f.wakesAtNight?' · 자다가 자주 깸':''}`);
+  if(f.dietHabits.length) lifestyleLines.push(`식습관: ${f.dietHabits.slice(0,3).join(', ')}${f.dietHabits.length>3?' 등':''}`);
+  if(!isOld && (f.stoolStatus.length||f.stoolFreq)) lifestyleLines.push(`배변: ${f.stoolStatus.join(', ')||'특이사항 없음'}${f.stoolFreq?` · 주 ${f.stoolFreq}회`:''}`);
+  if(f.screenTimeHours) lifestyleLines.push(`${isOld?'스마트폰/컴퓨터':'영상 시청'}: 하루 약 ${f.screenTimeHours}시간`);
+  if(f.caregivers.length) lifestyleLines.push(`동거인: ${f.caregivers.join(', ')}`);
+  document.getElementById('rp-lifestyle').innerHTML = lifestyleLines.length? lifestyleLines.map(l=>`<div class="mb-1.5">• ${l}</div>`).join('') : '<div>입력된 생활습관 정보가 없습니다.</div>';
+
+  const tips=[];
+  tips.push('단백질(살코기·생선·계란·콩류)과 칼슘(멸치·우유·두부)을 매일 고루 섭취하도록 해주세요.');
+  tips.push('성장호르몬은 깊은 잠에서 많이 분비되므로, 밤 10시 이전 취침과 하루 9~11시간 수면을 지켜주세요.');
+  tips.push('줄넘기·농구·수영처럼 성장판을 자극하는 운동을 주 3회 이상, 하루 30분 이상 해주면 좋습니다.');
+  if(parseFloat(f.screenTimeHours)>=3) tips.push('현재 화면 시청 시간이 다소 긴 편이니, 야외활동 시간을 조금씩 늘려보는 것을 권해드립니다.');
+  if(pctH<25) tips.push('키 백분위가 다소 낮은 편이니, 정기적인 성장 경과 관찰을 함께 해보시길 권합니다.');
+  document.getElementById('rp-growth-tips').innerHTML = tips.map(t=>`<div class="mb-1.5">• ${t}</div>`).join('');
+
+  const topPatternLabel = weakestOrgan[0]+'('+ORGAN_MODERN[weakestOrgan[0]]+')';
+  document.getElementById('rp-overall-opinion').innerText =
+    `주소증 "${f.chiefComplaint||'특이 증상 없음'}"과 문진 응답을 종합하면 ${topPatternLabel} 영역의 관리가 우선적으로 필요해 보입니다. 성장은 ${getHeightComment(pctH)} 진료실에서 아이 체질과 성장 속도에 맞춘 한방 관리 계획과 생활습관 코칭을 함께 안내해 드리겠습니다.`;
+
+  // 정서 · 불안 (8세 이상)
+  if(isOld){
+    const count=f.anxietyChecklist.length;
+    document.getElementById('rp-anxiety-count').innerText=`${count}/10`;
+    const pct=(count/10)*100;
+    let color='#16a34a', level='낮음 — 특별한 정서적 어려움 신호는 적어 보입니다.', comment='현재 응답만으로는 뚜렷한 불안 신호가 크지 않습니다. 평소처럼 아이의 마음 상태에 관심을 가져주세요.';
+    if(count>=6){ color='#dc2626'; level='상담 권장 — 정서적으로 힘든 부분이 있어 보입니다.'; comment='체크된 항목이 많은 편입니다. 전문 심리상담 또는 정신건강의학과 평가를 함께 받아보시길 권해 드립니다.'; }
+    else if(count>=3){ color='#d97706'; level='관찰 필요 — 몇 가지 긴장·불안 신호가 있습니다.'; comment='일상에서 아이가 스트레스를 받는 상황이 없는지 살펴봐 주시고, 지속되면 전문가 상담을 고려해 보세요.'; }
+    document.getElementById('rp-anxiety-ring').style.background=`conic-gradient(${color} ${pct}%, #E5E5EA 0)`;
+    document.getElementById('rp-anxiety-level').innerText=level;
+    document.getElementById('rp-anxiety-comment').innerText=comment;
+    document.getElementById('rp-anxiety-items').innerHTML = f.anxietyChecklist.length
+      ? f.anxietyChecklist.map(v=>`<span class="rp-chip">${v}</span>`).join('')
+      : `<span class="text-[13px] text-[#8E8E93]">체크된 항목이 없습니다.</span>`;
+  }
+
+  document.getElementById('app-shell').style.display='none';
+  document.getElementById('report-view').classList.add('active');
+  if(window.lucide) lucide.createIcons();
+  const statusEl=document.getElementById('save-status'); if(statusEl) statusEl.innerText='';
+  if(!skipSave) saveRecordToSheet();
+}
+
+window.onload=()=>updateUI();
+</script>
+</body>
+</html>
