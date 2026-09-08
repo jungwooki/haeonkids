@@ -14,17 +14,29 @@
   --ios-text:#000000; --ios-gray:#8E8E93; --ios-separator:#E5E5EA;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard',sans-serif;background:var(--ios-bg);color:var(--ios-text);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;margin:0;}
-.animate-fade-in{animation:springFadeIn .5s cubic-bezier(.16,1,.3,1) forwards;}
-@keyframes springFadeIn{0%{opacity:0;transform:translateY(15px)}100%{opacity:1;transform:translateY(0)}}
+.animate-fade-in{animation:softFadeIn .38s cubic-bezier(.4,0,.2,1) forwards;}
+@keyframes softFadeIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
 .step-content{display:none}.step-content.active{display:flex}
+.deep-step-content{display:none}.deep-step-content.active{display:flex}
+.diet-step-content{display:none}.diet-step-content.active{display:flex}
+.women-step-content{display:none}.women-step-content.active{display:flex}
+#deep-report-view{display:none}
+#deep-report-view.active{display:block}
+#diet-report-view{display:none}
+#diet-report-view.active{display:block}
+#women-report-view{display:none}
+#women-report-view.active{display:block}
 input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:10px}
 
 #report-view{display:none}
 #report-view.active{display:block}
-.report-scroll{width:100%;height:100%;overflow-y:auto;background:#E8E8ED;padding:24px 0 60px}
+.report-scroll{width:100%;height:100%;overflow-y:auto;background:#E8E8ED;padding:24px 0 60px;scroll-snap-type:y proximity;}
+@media screen{
+  #report-view.active,#deep-report-view.active,#diet-report-view.active,#women-report-view.active{position:fixed;inset:0;z-index:40;}
+}
 .report-toolbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--ios-separator);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.a4-page{width:210mm;min-height:297mm;background:#fff;margin:0 auto 14mm auto;box-shadow:0 6px 24px rgba(0,0,0,.08);border-radius:6px;box-sizing:border-box;padding:12mm 13mm;display:flex;flex-direction:column}
+.a4-page{width:210mm;min-height:297mm;background:#fff;margin:0 auto 14mm auto;box-shadow:0 6px 24px rgba(0,0,0,.08);border-radius:6px;box-sizing:border-box;padding:12mm 13mm;display:flex;flex-direction:column;scroll-snap-align:start;scroll-margin-top:24px;}
 .a4-page:last-child{margin-bottom:0}
 .rp-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--ios-tint);padding-bottom:10px;margin-bottom:14px}
 .rp-brand{display:flex;align-items:center;gap:8px}
@@ -61,10 +73,51 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
 </head>
 <body class="p-0 text-[17px] m-0 overflow-hidden">
 
-<div id="app-shell" class="flex flex-col w-screen h-screen bg-[var(--ios-bg)] relative overflow-hidden">
+<!-- ===================== 허브(입구) 화면 ===================== -->
+<div id="hub-view" class="flex flex-col w-screen h-screen items-center justify-center px-6" style="background:radial-gradient(circle at 50% 0%, #FFFFFF 0%, #EEF0F4 60%);">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-4">
+      <div class="w-14 h-14 bg-white rounded-[10px] flex items-center justify-center border border-black/[0.06] shadow-sm mx-auto mb-3">
+        <i data-lucide="cross" class="w-7 h-7 text-amber-500"></i>
+      </div>
+      <div class="text-[10px] font-bold text-slate-400 tracking-[0.2em] mb-1">HAEON CLINIC · SURVEY CONSOLE</div>
+      <h1 class="text-[24px] font-extrabold tracking-tight text-slate-900">통합 문진 시스템</h1>
+      <p class="text-[13px] text-slate-500 mt-1">진료 종류를 선택해 주세요</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-1.5 mb-2">
+      <button onclick="enterWomenSurvey()" class="hub-tile bg-white rounded-[9px] p-4 flex flex-col items-center gap-1.5 border border-black/[0.06] shadow-sm active:scale-[0.97] active:bg-slate-50 transition-all">
+        <div class="w-10 h-10 rounded-[8px] bg-pink-50 flex items-center justify-center"><i data-lucide="flower-2" class="w-5 h-5 text-pink-500"></i></div>
+        <span class="font-bold text-[15px] text-slate-900">여성</span>
+        <span class="text-[9px] font-medium text-slate-400">성인 대상</span>
+      </button>
+      <button onclick="enterChildSurvey()" class="hub-tile bg-white rounded-[9px] p-4 flex flex-col items-center gap-1.5 border border-black/[0.06] shadow-sm active:scale-[0.97] active:bg-slate-50 transition-all">
+        <div class="w-10 h-10 rounded-[8px] bg-amber-50 flex items-center justify-center"><i data-lucide="baby" class="w-5 h-5 text-amber-500"></i></div>
+        <span class="font-bold text-[15px] text-slate-900">소아(청소년)</span>
+        <span class="text-[9px] font-medium text-slate-400">만 0~15세</span>
+      </button>
+      <button onclick="enterDeepSurvey()" class="hub-tile bg-white rounded-[9px] p-4 flex flex-col items-center gap-1.5 border border-black/[0.06] shadow-sm active:scale-[0.97] active:bg-slate-50 transition-all">
+        <div class="w-10 h-10 rounded-[8px] bg-blue-50 flex items-center justify-center"><i data-lucide="stethoscope" class="w-5 h-5 text-blue-500"></i></div>
+        <span class="font-bold text-[15px] text-slate-900">심층진료</span>
+        <span class="text-[9px] font-medium text-slate-400">성인 대상</span>
+      </button>
+      <button onclick="enterDietSurvey()" class="hub-tile bg-white rounded-[9px] p-4 flex flex-col items-center gap-1.5 border border-black/[0.06] shadow-sm active:scale-[0.97] active:bg-slate-50 transition-all">
+        <div class="w-10 h-10 rounded-[8px] bg-orange-50 flex items-center justify-center"><i data-lucide="leaf" class="w-5 h-5 text-orange-500"></i></div>
+        <span class="font-bold text-[15px] text-slate-900">다이어트</span>
+        <span class="text-[9px] font-medium text-slate-400">성인 대상</span>
+      </button>
+    </div>
+
+    <button onclick="openSearchView()" class="w-full bg-white text-slate-700 font-semibold text-[14px] py-3 rounded-[9px] border border-black/[0.06] shadow-sm flex items-center justify-center gap-2 active:scale-[0.98] active:bg-slate-50 transition-all">
+      <i data-lucide="search" class="w-4 h-4 text-slate-400"></i> 결과 검색 (이름으로 조회)
+    </button>
+  </div>
+</div>
+
+<div id="app-shell" class="flex-col w-screen h-screen bg-[var(--ios-bg)] relative overflow-hidden" style="display:none;">
   <div class="h-16 bg-white/90 backdrop-blur-md border-b border-[#E5E5EA] flex items-center justify-between px-4 shrink-0 z-30 relative">
-    <button onclick="prevStep()" id="btn-back" class="text-slate-800 flex items-center gap-1 font-semibold text-[16px] active:opacity-50 transition-opacity hidden w-20">
-      <i data-lucide="chevron-left" class="w-6 h-6 -ml-2"></i> 이전
+    <button onclick="prevStep()" id="btn-back" class="text-slate-800 flex items-center gap-1 font-semibold text-[16px] active:opacity-50 transition-opacity w-20">
+      <i data-lucide="chevron-left" class="w-6 h-6 -ml-2"></i> <span id="btn-back-label">메인으로</span>
     </button>
     <div id="nav-brand" class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
       <div class="w-7 h-7 bg-[#FFF9E0] rounded-[8px] flex items-center justify-center border border-[#FFE58F]">
@@ -79,7 +132,7 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
   </div>
 
   <div id="scroll-container" class="flex-1 overflow-y-auto w-full px-5 pt-6 pb-10 scroll-smooth">
-    <div id="steps-container" class="w-full max-w-2xl mx-auto flex flex-col">
+    <div id="steps-container" class="w-full max-w-2xl md:max-w-3xl mx-auto flex flex-col">
 
       <div id="step-1" class="step-content active animate-fade-in flex-col items-center text-center justify-center mt-10">
         <div class="w-[100px] h-[100px] bg-white rounded-[28px] flex items-center justify-center mb-8 shadow-sm border border-gray-100">
@@ -138,6 +191,19 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
       <div class="rp-info-item"><div class="rp-info-label">키 / 체중</div><div class="rp-info-value" id="rp-body">-</div></div>
       <div class="rp-info-item"><div class="rp-info-label">보호자</div><div class="rp-info-value" id="rp-guardian">-</div></div>
       <div class="rp-info-item"><div class="rp-info-label">측정일</div><div class="rp-info-value" id="rp-date">-</div></div>
+    </div>
+
+    <div class="rp-card flex items-center gap-5 mb-3">
+      <div class="rp-ring" id="rp-hscale-ring" style="width:96px;height:96px;">
+        <div class="rp-ring-inner" style="width:70px;height:70px;">
+          <div class="text-[19px] font-extrabold text-black" id="rp-hscale-score">-</div>
+          <div class="text-[8px] text-[#8E8E93] font-bold">H-SCALE</div>
+        </div>
+      </div>
+      <div class="flex-1">
+        <div class="text-[15px] font-extrabold text-black mb-0.5" id="rp-hscale-grade">종합 건강 스코어</div>
+        <p class="text-[11px] leading-[16px] text-[#3C3C43]" id="rp-hscale-comment">오장·기혈수 밸런스를 종합한 해온 자체 건강 지표입니다.</p>
+      </div>
     </div>
 
     <div class="rp-card rp-soft">
@@ -278,6 +344,458 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
   </div>
 </div>
 
+<!-- ===================== 심층진료 (H-Scale) 문진 ===================== -->
+<div id="deep-app-shell" class="flex-col w-screen h-screen bg-[var(--ios-bg)] relative overflow-hidden" style="display:none;">
+  <div class="h-16 bg-white/90 backdrop-blur-md border-b border-[#E5E5EA] flex items-center justify-between px-4 shrink-0 z-30 relative">
+    <button onclick="deepPrevStep()" class="text-slate-800 flex items-center gap-1 font-semibold text-[16px] active:opacity-50 transition-opacity w-20">
+      <i data-lucide="chevron-left" class="w-6 h-6 -ml-2"></i> <span id="deep-btn-back-label">메인으로</span>
+    </button>
+    <div class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+      <div class="w-7 h-7 bg-blue-50 rounded-[8px] flex items-center justify-center border border-blue-100">
+        <i data-lucide="stethoscope" class="w-4 h-4 text-blue-600"></i>
+      </div>
+      <span id="deep-nav-title" class="font-bold text-[17px] text-black">소개</span>
+    </div>
+    <div class="w-20"></div>
+  </div>
+  <div class="h-[3px] w-full bg-[#E5E5EA] shrink-0">
+    <div id="deep-progress-fill" class="h-full bg-blue-600 transition-all duration-300" style="width:0%"></div>
+  </div>
+
+  <div id="deep-scroll-container" class="flex-1 overflow-y-auto w-full px-5 pt-6 pb-10 scroll-smooth">
+    <div class="w-full max-w-2xl md:max-w-3xl mx-auto flex flex-col">
+
+      <div id="deep-step-1" class="deep-step-content active flex-col items-center text-center justify-center mt-10">
+        <div class="w-[100px] h-[100px] bg-white rounded-[28px] flex items-center justify-center mb-8 shadow-sm border border-gray-100">
+          <i data-lucide="stethoscope" class="w-[50px] h-[50px] text-blue-600"></i>
+        </div>
+        <h2 class="text-[32px] font-extrabold tracking-tight text-black mb-4">심층진료 문진</h2>
+        <p class="text-[17px] text-[#3C3C43] leading-[26px] mb-12 max-w-md px-4">
+          오장(五臟)과 기·혈·수 밸런스를 정밀하게 분석하는 H-SCALE 심층 문진입니다. 작성이 끝나면 종합 건강 스코어와 변증 리포트가 바로 만들어집니다.
+        </p>
+        <button onclick="deepNextStep()" class="w-full max-w-xs bg-blue-600 text-white font-bold text-[18px] py-4 rounded-[16px] shadow-sm hover:bg-blue-700 active:scale-[0.98] transition-all">
+          문진표 작성 시작하기
+        </button>
+      </div>
+
+      <div id="deep-dynamic-container" class="deep-step-content flex-col gap-6 w-full"></div>
+    </div>
+  </div>
+
+  <div id="deep-bottom-action" class="shrink-0 bg-white border-t border-gray-200 p-4 pb-6 flex justify-center hidden z-40">
+    <button onclick="deepNextStep()" id="deep-next-btn" class="w-full max-w-2xl bg-blue-600 text-white font-bold text-[18px] py-4 rounded-[16px] shadow-sm hover:bg-blue-700 active:scale-[0.98] transition-all">다음 단계</button>
+  </div>
+</div>
+
+<!-- ===================== 심층진료 리포트 ===================== -->
+<div id="deep-report-view">
+<div class="report-scroll">
+  <div class="report-toolbar no-print">
+    <button onclick="deepBackToForm()" class="flex items-center gap-1 font-semibold text-[15px] text-slate-800 active:opacity-50">
+      <i data-lucide="chevron-left" class="w-5 h-5"></i> 문진표로 돌아가기
+    </button>
+    <span id="deep-save-status" class="text-[12px] font-semibold text-[#8E8E93]"></span>
+    <div class="flex gap-2">
+      <button onclick="if(confirm('처음부터 다시 작성하시겠습니까?')) window.location.reload();" class="text-red-500 font-semibold text-[14px] px-4 py-2">처음부터 다시</button>
+      <button onclick="window.print()" class="bg-black text-white font-bold text-[14px] px-5 py-2.5 rounded-[10px] flex items-center gap-2">
+        <i data-lucide="printer" class="w-4 h-4"></i> 인쇄 / PDF 저장
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE 1 : 오장 · 기혈수 · H-SCALE -->
+  <div class="a4-page">
+    <div class="rp-header" style="border-bottom-color:#2563eb;">
+      <div class="rp-brand">
+        <i data-lucide="stethoscope" class="w-6 h-6 text-blue-600"></i>
+        <div><div class="rp-title">해온한의원 심층진료 리포트</div><div class="rp-sub">H-SCALE 오장변증 · 기혈수 밸런스</div></div>
+      </div>
+      <div class="rp-page-badge" style="color:#2563eb;background:#EFF6FF;border-color:#BFDBFE;" id="deep-badge-1">1 / 2</div>
+    </div>
+
+    <div class="rp-info-bar">
+      <div class="rp-info-item"><div class="rp-info-label">이름</div><div class="rp-info-value" id="deep-rp-name">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">성별 / 나이</div><div class="rp-info-value" id="deep-rp-age">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">키 / 체중</div><div class="rp-info-value" id="deep-rp-body">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">건강자각</div><div class="rp-info-value" id="deep-rp-selfassess">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">측정일</div><div class="rp-info-value" id="deep-rp-date">-</div></div>
+    </div>
+
+    <div class="rp-card flex items-center gap-5 mb-3">
+      <div class="rp-ring" id="deep-hscale-ring" style="width:96px;height:96px;">
+        <div class="rp-ring-inner" style="width:70px;height:70px;">
+          <div class="text-[19px] font-extrabold text-black" id="deep-hscale-score">-</div>
+          <div class="text-[8px] text-[#8E8E93] font-bold">H-SCALE</div>
+        </div>
+      </div>
+      <div class="flex-1">
+        <div class="text-[15px] font-extrabold text-black mb-0.5" id="deep-hscale-grade">종합 건강 스코어</div>
+        <p class="text-[11px] leading-[16px] text-[#3C3C43]" id="deep-hscale-comment">오장·기혈수 밸런스를 종합한 해온 자체 건강 지표입니다.</p>
+      </div>
+    </div>
+
+    <div class="rp-card rp-soft">
+      <div class="rp-section-title"><i data-lucide="message-circle" class="w-4 h-4 text-blue-600"></i>주호소 (가장 불편한 증상)</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="deep-rp-complaint">-</p>
+    </div>
+
+    <div class="flex gap-4">
+      <div class="rp-card flex-1 flex flex-col items-center">
+        <div class="rp-section-title self-start"><i data-lucide="activity" class="w-4 h-4 text-blue-600"></i>오장(五臟) 균형도</div>
+        <div id="deep-rp-radar"></div>
+        <p class="text-[10px] text-[#8E8E93] mt-1 text-center">중심에서 <b>멀수록 튼튼</b>, 가까울수록 <b>관리가 필요</b>합니다</p>
+        <div id="deep-rp-organ-legend" class="w-full mt-2"></div>
+      </div>
+      <div class="rp-card flex-1 flex flex-col items-center">
+        <div class="rp-section-title self-start"><i data-lucide="droplets" class="w-4 h-4 text-blue-600"></i>기·혈·수 밸런스</div>
+        <div id="deep-rp-qhs-radar"></div>
+        <p class="text-[10px] text-[#8E8E93] mt-1 text-center">7가지 변증 유형 — <b>바깥쪽일수록 안정적</b>입니다</p>
+        <div id="deep-rp-qhs-legend" class="w-full mt-2"></div>
+      </div>
+    </div>
+
+    <div class="rp-card">
+      <div class="rp-section-title"><i data-lucide="heart-pulse" class="w-4 h-4 text-blue-600"></i>생활 · 전신 상태 요약</div>
+      <div id="deep-rp-lifestyle" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 리포트는 진료 참고용이며 의학적 진단을 대체하지 않습니다.</span><span id="deep-rp-footer-1"></span></div>
+  </div>
+
+  <!-- PAGE 2 : 여성건강 · 과거력 · 종합소견 -->
+  <div class="a4-page" id="deep-page-2">
+    <div class="rp-header" style="border-bottom-color:#2563eb;">
+      <div class="rp-brand">
+        <i data-lucide="clipboard-list" class="w-6 h-6 text-blue-600"></i>
+        <div><div class="rp-title">과거력 · 종합소견</div><div class="rp-sub">진료 시 참고할 배경 정보</div></div>
+      </div>
+      <div class="rp-page-badge" style="color:#2563eb;background:#EFF6FF;border-color:#BFDBFE;">2 / 2</div>
+    </div>
+
+    <div class="rp-card rp-soft mb-3" id="deep-rp-women-card" style="display:none;">
+      <div class="rp-section-title"><i data-lucide="heart" class="w-4 h-4 text-pink-500"></i>여성 건강</div>
+      <div id="deep-rp-women" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-card mb-3">
+      <div class="rp-section-title"><i data-lucide="history" class="w-4 h-4 text-blue-600"></i>과거력 · 수술 이력</div>
+      <div id="deep-rp-history" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-card">
+      <div class="rp-section-title"><i data-lucide="lightbulb" class="w-4 h-4 text-blue-600"></i>종합 소견</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="deep-rp-overall">-</p>
+    </div>
+
+    <div class="rp-card rp-soft">
+      <p class="text-[12px] leading-[19px] text-[#3C3C43]">위 소견은 문진 응답을 기준으로 한 예비 분석입니다. 진료실에서 직접 진맥·설진 등 정밀 진찰 후 체질에 맞는 처방과 관리 계획을 안내해 드립니다.</p>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 리포트는 진료 참고용이며 의학적 진단을 대체하지 않습니다.</span><span id="deep-rp-footer-2"></span></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 다이어트 (H-SCORE) 문진 ===================== -->
+<div id="diet-app-shell" class="flex-col w-screen h-screen bg-[var(--ios-bg)] relative overflow-hidden" style="display:none;">
+  <div class="h-16 bg-white/90 backdrop-blur-md border-b border-[#E5E5EA] flex items-center justify-between px-4 shrink-0 z-30 relative">
+    <button onclick="dietPrevStep()" class="text-slate-800 flex items-center gap-1 font-semibold text-[16px] active:opacity-50 transition-opacity w-20">
+      <i data-lucide="chevron-left" class="w-6 h-6 -ml-2"></i> <span id="diet-btn-back-label">메인으로</span>
+    </button>
+    <div class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+      <div class="w-7 h-7 bg-orange-50 rounded-[8px] flex items-center justify-center border border-orange-100">
+        <i data-lucide="scale" class="w-4 h-4 text-orange-600"></i>
+      </div>
+      <span id="diet-nav-title" class="font-bold text-[17px] text-black">소개</span>
+    </div>
+    <div class="w-20"></div>
+  </div>
+  <div class="h-[3px] w-full bg-[#E5E5EA] shrink-0">
+    <div id="diet-progress-fill" class="h-full bg-orange-500 transition-all duration-300" style="width:0%"></div>
+  </div>
+
+  <div id="diet-scroll-container" class="flex-1 overflow-y-auto w-full px-5 pt-6 pb-10 scroll-smooth">
+    <div class="w-full max-w-2xl md:max-w-3xl mx-auto flex flex-col">
+
+      <div id="diet-step-1" class="diet-step-content active flex-col items-center text-center justify-center mt-10">
+        <div class="w-[100px] h-[100px] bg-white rounded-[28px] flex items-center justify-center mb-8 shadow-sm border border-gray-100">
+          <i data-lucide="scale" class="w-[50px] h-[50px] text-orange-500"></i>
+        </div>
+        <h2 class="text-[32px] font-extrabold tracking-tight text-black mb-4">해온 다이어트 H-SCORE</h2>
+        <p class="text-[17px] text-[#3C3C43] leading-[26px] mb-12 max-w-md px-4">
+          체질을 분석해 최적의 감량 솔루션을 제안하는 다이어트 전용 문진입니다. 작성이 끝나면 오장 균형과 기혈수 변증 리포트가 바로 만들어집니다.
+        </p>
+        <button onclick="dietNextStep()" class="w-full max-w-xs bg-orange-500 text-white font-bold text-[18px] py-4 rounded-[16px] shadow-sm hover:bg-orange-600 active:scale-[0.98] transition-all">
+          문진표 작성 시작하기
+        </button>
+      </div>
+
+      <div id="diet-dynamic-container" class="diet-step-content flex-col gap-6 w-full"></div>
+    </div>
+  </div>
+
+  <div id="diet-bottom-action" class="shrink-0 bg-white border-t border-gray-200 p-4 pb-6 flex justify-center hidden z-40">
+    <button onclick="dietNextStep()" id="diet-next-btn" class="w-full max-w-2xl bg-orange-500 text-white font-bold text-[18px] py-4 rounded-[16px] shadow-sm hover:bg-orange-600 active:scale-[0.98] transition-all">다음 단계</button>
+  </div>
+</div>
+
+<!-- ===================== 다이어트 리포트 ===================== -->
+<div id="diet-report-view">
+<div class="report-scroll">
+  <div class="report-toolbar no-print">
+    <button onclick="dietBackToForm()" class="flex items-center gap-1 font-semibold text-[15px] text-slate-800 active:opacity-50">
+      <i data-lucide="chevron-left" class="w-5 h-5"></i> 문진표로 돌아가기
+    </button>
+    <span id="diet-save-status" class="text-[12px] font-semibold text-[#8E8E93]"></span>
+    <div class="flex gap-2">
+      <button onclick="if(confirm('처음부터 다시 작성하시겠습니까?')) window.location.reload();" class="text-red-500 font-semibold text-[14px] px-4 py-2">처음부터 다시</button>
+      <button onclick="window.print()" class="bg-black text-white font-bold text-[14px] px-5 py-2.5 rounded-[10px] flex items-center gap-2">
+        <i data-lucide="printer" class="w-4 h-4"></i> 인쇄 / PDF 저장
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE 1 : 오장 · 기혈수 · H-SCORE -->
+  <div class="a4-page">
+    <div class="rp-header" style="border-bottom-color:#f97316;">
+      <div class="rp-brand">
+        <i data-lucide="scale" class="w-6 h-6 text-orange-600"></i>
+        <div><div class="rp-title">해온 다이어트 H-SCORE 리포트</div><div class="rp-sub">오장 균형 · 기혈수(氣血水) 변증</div></div>
+      </div>
+      <div class="rp-page-badge" style="color:#c2410c;background:#FFF7ED;border-color:#FED7AA;" id="diet-badge-1">1 / 2</div>
+    </div>
+
+    <div class="rp-info-bar">
+      <div class="rp-info-item"><div class="rp-info-label">이름</div><div class="rp-info-value" id="diet-rp-name">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">성별</div><div class="rp-info-value" id="diet-rp-gender">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">희망 체중</div><div class="rp-info-value" id="diet-rp-target">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">다이어트 이유</div><div class="rp-info-value" id="diet-rp-reason" style="font-size:11px;">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">측정일</div><div class="rp-info-value" id="diet-rp-date">-</div></div>
+    </div>
+
+    <div class="rp-card flex items-center gap-5 mb-3">
+      <div class="rp-ring" id="diet-hscore-ring" style="width:96px;height:96px;">
+        <div class="rp-ring-inner" style="width:70px;height:70px;">
+          <div class="text-[19px] font-extrabold text-black" id="diet-hscore-score">-</div>
+          <div class="text-[8px] text-[#8E8E93] font-bold">H-SCORE</div>
+        </div>
+      </div>
+      <div class="flex-1">
+        <div class="text-[15px] font-extrabold text-black mb-0.5" id="diet-hscore-grade">종합 건강 스코어</div>
+        <p class="text-[11px] leading-[16px] text-[#3C3C43]">오장 균형과 기혈수 변증을 종합한 해온 자체 건강 지표입니다.</p>
+      </div>
+    </div>
+
+    <div class="flex gap-4">
+      <div class="rp-card flex-1 flex flex-col items-center">
+        <div class="rp-section-title self-start"><i data-lucide="activity" class="w-4 h-4 text-orange-600"></i>오장(五臟) 균형도</div>
+        <div id="diet-rp-radar"></div>
+        <p class="text-[10px] text-[#8E8E93] mt-1 text-center">중심에서 <b>멀수록 튼튼</b>, 가까울수록 <b>관리가 필요</b>합니다</p>
+        <div id="diet-rp-organ-legend" class="w-full mt-2"></div>
+      </div>
+      <div class="rp-card flex-1 flex flex-col items-center">
+        <div class="rp-section-title self-start"><i data-lucide="droplets" class="w-4 h-4 text-orange-600"></i>기·혈·수 밸런스</div>
+        <div id="diet-rp-qhs-radar"></div>
+        <p class="text-[10px] text-[#8E8E93] mt-1 text-center">7가지 변증 유형 — <b>바깥쪽일수록 안정적</b>입니다</p>
+        <div id="diet-rp-qhs-legend" class="w-full mt-2"></div>
+      </div>
+    </div>
+
+    <div class="rp-card">
+      <div class="rp-section-title"><i data-lucide="notebook-pen" class="w-4 h-4 text-orange-600"></i>생활습관 요약</div>
+      <div id="diet-rp-lifestyle" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 리포트는 진료 참고용이며 의학적 진단을 대체하지 않습니다.</span><span id="diet-rp-footer-1"></span></div>
+  </div>
+
+  <!-- PAGE 2 : 병력 · 여성건강 · 다이어트 가이드 · 종합소견 -->
+  <div class="a4-page">
+    <div class="rp-header" style="border-bottom-color:#f97316;">
+      <div class="rp-brand">
+        <i data-lucide="clipboard-list" class="w-6 h-6 text-orange-600"></i>
+        <div><div class="rp-title">병력 · 감량 가이드 · 종합소견</div><div class="rp-sub">진료 시 참고할 배경 정보</div></div>
+      </div>
+      <div class="rp-page-badge" style="color:#c2410c;background:#FFF7ED;border-color:#FED7AA;">2 / 2</div>
+    </div>
+
+    <div class="rp-card rp-soft mb-3" id="diet-rp-women-card" style="display:none;">
+      <div class="rp-section-title"><i data-lucide="heart" class="w-4 h-4 text-pink-500"></i>여성 건강</div>
+      <div id="diet-rp-women" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-card mb-3">
+      <div class="rp-section-title"><i data-lucide="history" class="w-4 h-4 text-orange-600"></i>비만 치료 이력 · 가족력</div>
+      <div id="diet-rp-history" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-card mb-3">
+      <div class="rp-section-title"><i data-lucide="salad" class="w-4 h-4 text-orange-600"></i>건강한 감량을 위한 일반 가이드</div>
+      <div id="diet-rp-tips" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-card">
+      <div class="rp-section-title"><i data-lucide="lightbulb" class="w-4 h-4 text-orange-600"></i>종합 소견</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="diet-rp-overall">-</p>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 리포트는 진료 참고용이며 의학적 진단을 대체하지 않습니다.</span><span id="diet-rp-footer-2"></span></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== 여성건강 문진 ===================== -->
+<div id="women-app-shell" class="flex-col w-screen h-screen bg-[var(--ios-bg)] relative overflow-hidden" style="display:none;">
+  <div class="h-16 bg-white/90 backdrop-blur-md border-b border-[#E5E5EA] flex items-center justify-between px-4 shrink-0 z-30 relative">
+    <button onclick="womenPrevStep()" class="text-slate-800 flex items-center gap-1 font-semibold text-[16px] active:opacity-50 transition-opacity w-20">
+      <i data-lucide="chevron-left" class="w-6 h-6 -ml-2"></i> <span id="women-btn-back-label">메인으로</span>
+    </button>
+    <div class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+      <div class="w-7 h-7 bg-pink-50 rounded-[8px] flex items-center justify-center border border-pink-100">
+        <i data-lucide="flower-2" class="w-4 h-4 text-pink-600"></i>
+      </div>
+      <span id="women-nav-title" class="font-bold text-[17px] text-black">소개</span>
+    </div>
+    <div class="w-20"></div>
+  </div>
+  <div class="h-[3px] w-full bg-[#E5E5EA] shrink-0">
+    <div id="women-progress-fill" class="h-full bg-pink-500 transition-all duration-300" style="width:0%"></div>
+  </div>
+
+  <div id="women-scroll-container" class="flex-1 overflow-y-auto w-full px-5 pt-6 pb-10 scroll-smooth">
+    <div class="w-full max-w-2xl md:max-w-3xl mx-auto flex flex-col">
+
+      <div id="women-step-1" class="women-step-content active flex-col items-center text-center justify-center mt-10">
+        <div class="w-[100px] h-[100px] bg-white rounded-[28px] flex items-center justify-center mb-8 shadow-sm border border-gray-100">
+          <i data-lucide="flower-2" class="w-[50px] h-[50px] text-pink-500"></i>
+        </div>
+        <h2 class="text-[32px] font-extrabold tracking-tight text-black mb-4">HAEON K-MEDI<br>여성건강문진</h2>
+        <p class="text-[17px] text-[#3C3C43] leading-[26px] mb-12 max-w-md px-4">
+          자궁·난소 건강부터 전신 오장육부 상태까지 꼼꼼히 점검합니다. 작성이 끝나면 기혈수·오장 변증 리포트가 바로 만들어집니다.
+        </p>
+        <button onclick="womenNextStep()" class="w-full max-w-xs bg-pink-500 text-white font-bold text-[18px] py-4 rounded-[16px] shadow-sm hover:bg-pink-600 active:scale-[0.98] transition-all">
+          문진표 작성 시작하기
+        </button>
+      </div>
+
+      <div id="women-dynamic-container" class="women-step-content flex-col gap-6 w-full"></div>
+    </div>
+  </div>
+
+  <div id="women-bottom-action" class="shrink-0 bg-white border-t border-gray-200 p-4 pb-6 flex justify-center hidden z-40">
+    <button onclick="womenNextStep()" id="women-next-btn" class="w-full max-w-2xl bg-pink-500 text-white font-bold text-[18px] py-4 rounded-[16px] shadow-sm hover:bg-pink-600 active:scale-[0.98] transition-all">다음 단계</button>
+  </div>
+</div>
+
+<!-- ===================== 여성건강 리포트 ===================== -->
+<div id="women-report-view">
+<div class="report-scroll">
+  <div class="report-toolbar no-print">
+    <button onclick="womenBackToForm()" class="flex items-center gap-1 font-semibold text-[15px] text-slate-800 active:opacity-50">
+      <i data-lucide="chevron-left" class="w-5 h-5"></i> 문진표로 돌아가기
+    </button>
+    <span id="women-save-status" class="text-[12px] font-semibold text-[#8E8E93]"></span>
+    <div class="flex gap-2">
+      <button onclick="if(confirm('처음부터 다시 작성하시겠습니까?')) window.location.reload();" class="text-red-500 font-semibold text-[14px] px-4 py-2">처음부터 다시</button>
+      <button onclick="window.print()" class="bg-black text-white font-bold text-[14px] px-5 py-2.5 rounded-[10px] flex items-center gap-2">
+        <i data-lucide="printer" class="w-4 h-4"></i> 인쇄 / PDF 저장
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE 1 : 오장 · 기혈수 · H-SCALE -->
+  <div class="a4-page">
+    <div class="rp-header" style="border-bottom-color:#ec4899;">
+      <div class="rp-brand">
+        <i data-lucide="flower-2" class="w-6 h-6 text-pink-600"></i>
+        <div><div class="rp-title">HAEON K-MEDI 여성건강 리포트</div><div class="rp-sub">오장변증 · 기혈수 밸런스</div></div>
+      </div>
+      <div class="rp-page-badge" style="color:#be185d;background:#FDF2F8;border-color:#FBCFE8;" id="women-badge-1">1 / 2</div>
+    </div>
+
+    <div class="rp-info-bar">
+      <div class="rp-info-item"><div class="rp-info-label">이름</div><div class="rp-info-value" id="women-rp-name">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">나이</div><div class="rp-info-value" id="women-rp-age">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">키 / 체중</div><div class="rp-info-value" id="women-rp-body">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">LMP</div><div class="rp-info-value" id="women-rp-lmp">-</div></div>
+      <div class="rp-info-item"><div class="rp-info-label">측정일</div><div class="rp-info-value" id="women-rp-date">-</div></div>
+    </div>
+
+    <div class="rp-card flex items-center gap-5 mb-3">
+      <div class="rp-ring" id="women-hscale-ring" style="width:96px;height:96px;">
+        <div class="rp-ring-inner" style="width:70px;height:70px;">
+          <div class="text-[19px] font-extrabold text-black" id="women-hscale-score">-</div>
+          <div class="text-[8px] text-[#8E8E93] font-bold">H-SCALE</div>
+        </div>
+      </div>
+      <div class="flex-1">
+        <div class="text-[15px] font-extrabold text-black mb-0.5" id="women-hscale-grade">종합 건강 스코어</div>
+        <p class="text-[11px] leading-[16px] text-[#3C3C43]">오장·기혈수 밸런스를 종합한 해온 자체 건강 지표입니다.</p>
+      </div>
+    </div>
+
+    <div class="rp-card rp-soft">
+      <div class="rp-section-title"><i data-lucide="message-circle" class="w-4 h-4 text-pink-600"></i>주호소 (가장 불편한 증상)</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="women-rp-complaint">-</p>
+    </div>
+
+    <div class="flex gap-4">
+      <div class="rp-card flex-1 flex flex-col items-center">
+        <div class="rp-section-title self-start"><i data-lucide="activity" class="w-4 h-4 text-pink-600"></i>오장(五臟) 균형도</div>
+        <div id="women-rp-radar"></div>
+        <p class="text-[10px] text-[#8E8E93] mt-1 text-center">중심에서 <b>멀수록 튼튼</b>, 가까울수록 <b>관리가 필요</b>합니다</p>
+        <div id="women-rp-organ-legend" class="w-full mt-2"></div>
+      </div>
+      <div class="rp-card flex-1 flex flex-col items-center">
+        <div class="rp-section-title self-start"><i data-lucide="droplets" class="w-4 h-4 text-pink-600"></i>기·혈·수 밸런스</div>
+        <div id="women-rp-qhs-radar"></div>
+        <p class="text-[10px] text-[#8E8E93] mt-1 text-center">6가지 변증 유형 — <b>바깥쪽일수록 안정적</b>입니다</p>
+        <div id="women-rp-qhs-legend" class="w-full mt-2"></div>
+      </div>
+    </div>
+
+    <div class="rp-card">
+      <div class="rp-section-title"><i data-lucide="thermometer" class="w-4 h-4 text-pink-600"></i>전신 생리 지표 요약</div>
+      <div id="women-rp-lifestyle" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 리포트는 진료 참고용이며 의학적 진단을 대체하지 않습니다.</span><span id="women-rp-footer-1"></span></div>
+  </div>
+
+  <!-- PAGE 2 : 월경 · 과거력 · 종합소견 -->
+  <div class="a4-page">
+    <div class="rp-header" style="border-bottom-color:#ec4899;">
+      <div class="rp-brand">
+        <i data-lucide="clipboard-list" class="w-6 h-6 text-pink-600"></i>
+        <div><div class="rp-title">자궁 · 월경 · 종합소견</div><div class="rp-sub">진료 시 참고할 배경 정보</div></div>
+      </div>
+      <div class="rp-page-badge" style="color:#be185d;background:#FDF2F8;border-color:#FBCFE8;">2 / 2</div>
+    </div>
+
+    <div class="rp-card rp-soft mb-3">
+      <div class="rp-section-title"><i data-lucide="heart" class="w-4 h-4 text-pink-500"></i>자궁 및 월경 건강</div>
+      <div id="women-rp-period" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-card mb-3">
+      <div class="rp-section-title"><i data-lucide="history" class="w-4 h-4 text-pink-600"></i>과거력 · 수술 이력</div>
+      <div id="women-rp-history" class="text-[12px] leading-[20px] text-[#3C3C43]"></div>
+    </div>
+
+    <div class="rp-card">
+      <div class="rp-section-title"><i data-lucide="lightbulb" class="w-4 h-4 text-pink-600"></i>종합 소견</div>
+      <p class="text-[13px] leading-[20px] text-[#3C3C43]" id="women-rp-overall">-</p>
+    </div>
+
+    <div class="rp-card rp-soft">
+      <p class="text-[12px] leading-[19px] text-[#3C3C43]">위 소견은 문진 응답을 기준으로 한 예비 분석입니다. 진료실에서 직접 진맥·설진 등 정밀 진찰 후 체질에 맞는 처방과 관리 계획을 안내해 드립니다.</p>
+    </div>
+
+    <div class="rp-footer"><span>해온한의원 · 본 리포트는 진료 참고용이며 의학적 진단을 대체하지 않습니다.</span><span id="women-rp-footer-2"></span></div>
+  </div>
+</div>
+</div>
+
 <script>
 /* ===================== 0. 저장소 설정 (Google Sheet) =====================
    1) 새 구글시트를 만들고 확장 프로그램 > Apps Script 에서 아래 코드를 붙여넣으세요:
@@ -286,7 +804,7 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
      var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('records')
            || SpreadsheetApp.getActiveSpreadsheet().insertSheet('records');
      var d = JSON.parse(e.postData.contents);
-     sh.appendRow([new Date(), d.name, d.birthDate, d.gender, d.ageGroup, JSON.stringify(d.formData)]);
+     sh.appendRow([new Date(), d.category || '소아', d.name, d.birthDate, d.gender, d.ageGroup, JSON.stringify(d.formData)]);
      return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
    }
    function doGet(e){
@@ -296,19 +814,25 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
      var out = [];
      for (var i=0;i<rows.length;i++){
        var r = rows[i];
-       if (!q || (r[1] && String(r[1]).indexOf(q) !== -1)){
-         out.push({ts:r[0], name:r[1], birthDate:r[2], gender:r[3], ageGroup:r[4], data:r[5]});
+       // r 열 순서: [날짜, 카테고리, 이름, 생년월일, 성별, 연령대, 데이터JSON]
+       if (!q || (r[2] && String(r[2]).indexOf(q) !== -1)){
+         out.push({ts:r[0], category:r[1], name:r[2], birthDate:r[3], gender:r[4], ageGroup:r[5], data:r[6]});
        }
      }
      out.sort(function(a,b){ return new Date(b.ts) - new Date(a.ts); });
      return ContentService.createTextOutput(JSON.stringify({ok:true, results:out})).setMimeType(ContentService.MimeType.JSON);
    }
 
+   ※ 기존에 이미 이 스크립트를 쓰고 계셨다면, 위 코드로 전체 교체 후 반드시
+     "배포 > 배포 관리 > 편집 > 새 버전"으로 다시 배포해야 반영됩니다.
+     (기존 시트에 카테고리 열이 없던 이전 데이터는 자동으로 "소아"로 표시됩니다.)
+
    2) 배포 > 새 배포 > 웹 앱: 실행 계정 "나", 액세스 권한 "모든 사용자"로 배포
    3) 발급된 웹 앱 URL을 아래 SHEET_URL 에 붙여넣으세요.
 ================================================================= */
-const CONFIG = { SHEET_URL: 'https://script.google.com/macros/s/AKfycbxgIvdgwQq4tQLnolDHW7aHKD9_AlAZPtejfQJMka4iTaor_Q3jSJwdqAFxvtx04VmV/exec' }; // 예: 'https://script.google.com/macros/s/AKfycb.../exec'
+const CONFIG = { SHEET_URL: 'https://script.google.com/macros/s/AKfycbxgIvdgwQq4tQLnolDHW7aHKD9_AlAZPtejfQJMka4iTaor_Q3jSJwdqAFxvtx04VmV/exec' };
 let cameFromSearch = false;
+function triggerFadeIn(el){ if(!el) return; el.classList.remove('animate-fade-in'); void el.offsetWidth; el.classList.add('animate-fade-in'); }
 
 /* ===================== 1. State ===================== */
 let currentStep = 1;
@@ -402,13 +926,14 @@ const UI = {
       </div>
     </label>`,
   checkRow:(label,category,value)=>`
-    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white cursor-pointer active:bg-gray-50 transition-colors">
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] bg-white cursor-pointer active:bg-gray-50 transition-colors">
       <span class="text-[15px] font-semibold text-black">${label}</span>
       <div class="relative flex items-center justify-center">
         <input type="checkbox" class="sr-only peer" onchange="updateCheck('${category}', '${value}', this.checked)" ${formData[category].includes(value)?'checked':''}>
         <i data-lucide="check" class="w-6 h-6 text-[#FFCC00] opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></i>
       </div>
     </label>`,
+  checkGrid:(items,category)=>`<div class="md:grid md:grid-cols-2 md:divide-x md:divide-[#E5E5EA]">${items.map(v=>UI.checkRow(v,category,v)).join('')}</div>`,
   checkWithNote:(label,boolField,noteField,notePlaceholder)=>`
     <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white gap-3">
       <label class="flex items-center gap-3 cursor-pointer shrink-0">
@@ -542,7 +1067,7 @@ const sections = {
     return `
     ${UI.header('생활 습관')}
     ${UI.subhead('식사습관 (다중 선택)')}
-    ${UI.group(o.dietHabits.map(v=>UI.checkRow(v,'dietHabits',v)).join(''))}
+    ${UI.group(UI.checkGrid(o.dietHabits,'dietHabits'))}
     ${UI.group(UI.inputRow('알레르기 유발 음식','allergyFood','없음'))}
 
     ${UI.subhead('수면습관')}
@@ -558,11 +1083,11 @@ const sections = {
     `)}
 
     ${UI.subhead('사회성')}
-    ${UI.group(OPT_SOCIAL.map(v=>UI.checkRow(v,'socialTraits',v)).join(''))}
+    ${UI.group(UI.checkGrid(OPT_SOCIAL,'socialTraits'))}
     ${UI.group(UI.inputRow(old?'스마트폰/컴퓨터 사용 시간':'TV/스마트폰 시청 시간','screenTimeHours','0','number','시간/일'))}
 
     ${UI.subhead('정서 (다중 선택)')}
-    ${UI.group(o.emotionTraits.map(v=>UI.checkRow(v,'emotionTraits',v)).join(''))}
+    ${UI.group(UI.checkGrid(o.emotionTraits,'emotionTraits'))}
     ${UI.subhead('화가 나면')}
     ${UI.group(OPT_ANGER.map(v=>UI.checkRow(v,'angerResponse',v)).join(''))}
     ${UI.group(UI.inputRow('기타 정서 변화','angerOther','있다면 입력'))}
@@ -618,15 +1143,15 @@ const sections = {
 
     ${UI.header('오장육부 계통 문진')}
     ${UI.subhead('간(肝) 기능 계통')}
-    ${UI.group(OPT_LIVER.map(v=>UI.checkRow(v,'sysLiver',v)).join(''))}
+    ${UI.group(UI.checkGrid(OPT_LIVER,'sysLiver'))}
     ${UI.subhead('심(心) 기능 계통')}
-    ${UI.group(OPT_HEART.map(v=>UI.checkRow(v,'sysHeart',v)).join(''))}
+    ${UI.group(UI.checkGrid(OPT_HEART,'sysHeart'))}
     ${UI.subhead('비(脾) 기능 계통')}
-    ${UI.group(o.sysSpleen.map(v=>UI.checkRow(v,'sysSpleen',v)).join(''))}
+    ${UI.group(UI.checkGrid(o.sysSpleen,'sysSpleen'))}
     ${UI.subhead('폐(肺) 기능 계통')}
-    ${UI.group(OPT_LUNG.map(v=>UI.checkRow(v,'sysLung',v)).join(''))}
+    ${UI.group(UI.checkGrid(OPT_LUNG,'sysLung'))}
     ${UI.subhead('신(腎) 기능 계통')}
-    ${UI.group(OPT_KIDNEY.map(v=>UI.checkRow(v,'sysKidney',v)).join(''))}
+    ${UI.group(UI.checkGrid(OPT_KIDNEY,'sysKidney'))}
 
     ${UI.header('마무리')}
     ${UI.group(UI.inputRow('보호자 성함','guardianName','이름 입력'))}
@@ -638,7 +1163,7 @@ const sections = {
       이제부터는 <b>아이가 직접</b> 하나씩 읽고, 나에게 맞는다고 생각되면 체크해 주세요. 정답은 없으니 평소 느끼는 대로 답하면 됩니다.
     </p>
     ${UI.subhead('아래 항목 중 나에게 맞는 것을 모두 골라주세요')}
-    ${UI.group(OPT_ANXIETY.map(v=>UI.checkRow(v,'anxietyChecklist',v)).join(''))}
+    ${UI.group(UI.checkGrid(OPT_ANXIETY,'anxietyChecklist'))}
     <p class="text-[12px] font-medium text-[#8E8E93] text-center mt-6">이 체크리스트는 정식 심리검사가 아닌 예비 선별용입니다.</p>`
   }
 };
@@ -659,25 +1184,25 @@ function refreshStep(){
 }
 window.updateUI = function(){
   const container=document.getElementById('dynamic-container');
-  container.classList.remove('animate-fade-in'); void container.offsetWidth; container.classList.add('animate-fade-in');
+  triggerFadeIn(container);
   document.querySelectorAll('.step-content').forEach(s=>s.classList.remove('active'));
   const bottomAction=document.getElementById('bottom-action'), nextBtn=document.getElementById('next-btn'),
-        backBtn=document.getElementById('btn-back'), navTitle=document.getElementById('nav-title'),
+        backBtnLabel=document.getElementById('btn-back-label'), navTitle=document.getElementById('nav-title'),
         scrollContainer=document.getElementById('scroll-container');
   if(currentStep===1){
     document.getElementById('step-1').classList.add('active');
-    bottomAction.classList.add('hidden'); backBtn.classList.add('hidden'); navTitle.innerText='소개';
+    bottomAction.classList.add('hidden'); backBtnLabel.innerText='메인으로'; navTitle.innerText='소개';
   } else {
     const config=sections[currentStep];
     container.innerHTML=config.html(); container.classList.add('active');
-    bottomAction.classList.remove('hidden'); backBtn.classList.remove('hidden'); navTitle.innerText=config.navTitle;
+    bottomAction.classList.remove('hidden'); backBtnLabel.innerText='이전'; navTitle.innerText=config.navTitle;
     nextBtn.innerText = (currentStep===getTotalSteps()) ? '완료 및 리포트 생성' : '다음 단계';
   }
   renderProgress(); if(window.lucide) lucide.createIcons();
   if(scrollContainer) scrollContainer.scrollTo(0,0);
 };
 window.nextStep=function(){ if(currentStep<getTotalSteps()){ currentStep++; updateUI(); } else { generateReportAndShow(); } };
-window.prevStep=function(){ if(currentStep>1){ currentStep--; updateUI(); } };
+window.prevStep=function(){ if(currentStep>1){ currentStep--; updateUI(); } else { returnToHub(); } };
 window.backToForm=function(){
   document.title='해온한의원 소아(청소년)과 문진표';
   document.getElementById('report-view').classList.remove('active');
@@ -691,6 +1216,20 @@ window.backToForm=function(){
 };
 window.resetAll=function(){ if(confirm('모든 입력 내용이 초기화됩니다. 계속하시겠습니까?')) window.location.reload(); };
 
+/* ===================== 허브(입구) 내비게이션 ===================== */
+window.enterChildSurvey = function(){
+  document.getElementById('hub-view').style.display='none';
+  const shell=document.getElementById('app-shell'); shell.style.display='flex'; triggerFadeIn(shell);
+  currentStep=1; updateUI();
+};
+window.enterPlaceholder = function(label){
+  alert(`${label} 문진은 준비 중입니다. 곧 추가될 예정이니 먼저 소아(청소년) 문진을 이용해 주세요.`);
+};
+window.returnToHub = function(){
+  document.getElementById('app-shell').style.display='none';
+  const hub=document.getElementById('hub-view'); hub.style.display='flex'; triggerFadeIn(hub);
+};
+
 /* ===================== 저장 / 검색 (Google Sheet) ===================== */
 function isSheetConfigured(){ return CONFIG.SHEET_URL && CONFIG.SHEET_URL.trim().length > 0; }
 
@@ -701,10 +1240,21 @@ function saveRecordToSheet(){
     return;
   }
   if(statusEl) statusEl.innerText = '저장 중...';
-  const payload = { name: formData.name, birthDate: formData.birthDate, gender: formData.gender, ageGroup: getAgeGroup(), formData: formData };
-  fetch(CONFIG.SHEET_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
-    .then(()=>{ if(statusEl) statusEl.innerText = '저장 완료 ✓'; })
-    .catch(()=>{ if(statusEl) statusEl.innerText = '저장 실패 - 네트워크를 확인해 주세요'; });
+  const payload = { category:'소아', name: formData.name, birthDate: formData.birthDate, gender: formData.gender, ageGroup: getAgeGroup(), formData: formData };
+  // 구글 앱스크립트 웹앱은 응답 전에 googleusercontent.com으로 리다이렉트되는데,
+  // 이 과정에서 브라우저가 CORS를 이유로 fetch를 실패 처리하는 경우가 많습니다.
+  // 저장은 "보내기만" 하면 되므로 no-cors 모드로 전송해 이 문제를 피합니다.
+  fetch(CONFIG.SHEET_URL, {
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  })
+    .then(()=>{ if(statusEl) statusEl.innerText = '저장 요청 완료 ✓'; })
+    .catch((err)=>{
+      console.error('저장 실패:', err);
+      if(statusEl) statusEl.innerText = '저장 실패 - CONFIG.SHEET_URL 및 배포 설정을 확인해 주세요';
+    });
 }
 
 window.openSearchView = function(){
@@ -712,6 +1262,7 @@ window.openSearchView = function(){
     alert('아직 검색 저장소(Google Sheet)가 설정되지 않았습니다. CONFIG.SHEET_URL 을 설정한 뒤 사용해 주세요.');
     return;
   }
+  document.getElementById('hub-view').style.display='none';
   document.getElementById('app-shell').style.display='none';
   document.getElementById('search-view').style.display='block';
   document.getElementById('search-input').value='';
@@ -720,7 +1271,7 @@ window.openSearchView = function(){
 };
 window.closeSearchView = function(){
   document.getElementById('search-view').style.display='none';
-  document.getElementById('app-shell').style.display='flex';
+  document.getElementById('hub-view').style.display='flex';
 };
 
 window.searchRecords = function(query){
@@ -737,21 +1288,48 @@ window.searchRecords = function(query){
       resultsEl.innerHTML = json.results.map((rec,i)=>{
         const d = new Date(rec.ts);
         const dateLabel = isNaN(d) ? '' : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        const cat = rec.category || '소아';
         return `<button onclick='loadRecordAndShowReport(${i})' class="text-left bg-white border border-[#E5E5EA] rounded-[12px] p-4 flex justify-between items-center active:bg-gray-50">
-          <div><div class="font-bold text-[16px] text-black">${rec.name||'이름 미상'}</div><div class="text-[12px] text-[#8E8E93]">${rec.birthDate||''} · ${rec.gender||''}</div></div>
+          <div><div class="font-bold text-[16px] text-black">${rec.name||'이름 미상'} <span class="text-[10px] font-bold text-[#C79000] bg-[#FFF9E0] px-2 py-0.5 rounded-full align-middle">${cat}</span></div><div class="text-[12px] text-[#8E8E93] mt-1">${rec.birthDate||''} · ${rec.gender||''}</div></div>
           <div class="text-[12px] text-[#8E8E93]">${dateLabel}</div>
         </button>`;
       }).join('');
       window._searchResults = json.results;
     })
-    .catch(()=>{ statusEl.innerText='검색 중 오류가 발생했습니다.'; });
+    .catch((err)=>{ console.error('검색 실패:', err); statusEl.innerText='검색 중 오류가 발생했습니다. (배포 접근권한이 "모든 사용자"인지 확인해 주세요)'; });
 };
 
 window.loadRecordAndShowReport = function(idx){
   const rec = window._searchResults[idx];
   if(!rec) return;
+  const cat = rec.category || '소아';
   let parsed;
   try{ parsed = JSON.parse(rec.data); }catch(e){ alert('저장된 데이터를 불러오지 못했습니다.'); return; }
+  if(cat === '심층진료'){
+    Object.assign(deepFormData, parsed);
+    deepCameFromSearch = true;
+    document.getElementById('search-view').style.display='none';
+    generateDeepReportAndShow(true);
+    return;
+  }
+  if(cat === '다이어트'){
+    Object.assign(dietFormData, parsed);
+    dietCameFromSearch = true;
+    document.getElementById('search-view').style.display='none';
+    generateDietReportAndShow(true);
+    return;
+  }
+  if(cat === '여성'){
+    Object.assign(womenFormData, parsed);
+    womenCameFromSearch = true;
+    document.getElementById('search-view').style.display='none';
+    generateWomenReportAndShow(true);
+    return;
+  }
+  if(cat !== '소아'){
+    alert(`"${cat}" 문진 결과 보기는 아직 준비 중입니다. 곧 지원될 예정입니다.`);
+    return;
+  }
   Object.assign(formData, parsed);
   cameFromSearch = true;
   document.getElementById('search-view').style.display='none';
@@ -877,6 +1455,21 @@ function generateReportAndShow(skipSave){
   renderLegend('rp-organ-legend', organ, ORGAN_MODERN);
   renderLegend('rp-qhs-legend', qhs, QHS_MODERN);
 
+  // 종합 건강 스코어 (H-Scale) — 오장 평균 + 기혈수 평균 (+8세 이상은 정서 체크 반영)
+  const organAvg = Object.values(organ).reduce((a,b)=>a+b,0)/Object.values(organ).length;
+  const qhsAvg = Object.values(qhs).reduce((a,b)=>a+b,0)/Object.values(qhs).length;
+  const hscaleParts = [organAvg, qhsAvg];
+  if(isOld){ const anxCount=f.anxietyChecklist.length; hscaleParts.push(Math.max(8, 100-(anxCount/10)*90)); }
+  const hscaleScore = Math.round(hscaleParts.reduce((a,b)=>a+b,0)/hscaleParts.length);
+  let hscaleGrade='관찰필요', hscaleColor='#dc2626';
+  if(hscaleScore>=80){ hscaleGrade='우수'; hscaleColor='#16a34a'; }
+  else if(hscaleScore>=60){ hscaleGrade='양호'; hscaleColor='#65a30d'; }
+  else if(hscaleScore>=40){ hscaleGrade='보통'; hscaleColor='#d97706'; }
+  document.getElementById('rp-hscale-score').innerText = hscaleScore;
+  document.getElementById('rp-hscale-ring').style.background = `conic-gradient(${hscaleColor} ${hscaleScore}%, #E5E5EA 0)`;
+  document.getElementById('rp-hscale-grade').innerText = `종합 건강 스코어 ${hscaleScore}점 · ${hscaleGrade}`;
+  document.getElementById('rp-hscale-comment').innerText = `오장 균형과 기혈수 밸런스${isOld?', 정서 체크리스트':''}를 종합한 해온 자체 지표입니다. 점수가 높을수록 전반적인 컨디션이 안정적임을 의미합니다.`;
+
   const weakestOrgan=Object.entries(organ).sort((a,b)=>a[1]-b[1])[0];
   const weakestQhs=Object.entries(qhs).sort((a,b)=>a[1]-b[1])[0];
   const growthText = `현재 아이는 오장 중 <b>${weakestOrgan[0]}(${ORGAN_MODERN[weakestOrgan[0]]})</b> 관련 신호가, 기혈수 중에서는 <b>${weakestQhs[0]}(${QHS_MODERN[weakestQhs[0]]})</b> 영역이 또래 대비 상대적으로 약한 편으로 나타났습니다. `
@@ -942,13 +1535,953 @@ function generateReportAndShow(skipSave){
   }
 
   document.getElementById('app-shell').style.display='none';
-  document.getElementById('report-view').classList.add('active');
+  const _rv=document.getElementById('report-view'); _rv.classList.add('active'); triggerFadeIn(_rv.querySelector('.report-scroll'));
   if(window.lucide) lucide.createIcons();
   const statusEl=document.getElementById('save-status'); if(statusEl) statusEl.innerText='';
   if(!skipSave) saveRecordToSheet();
 }
 
-window.onload=()=>updateUI();
+/* ===================== 심층진료 (H-SCALE) 모듈 ===================== */
+let deepCurrentStep = 1;
+let deepCameFromSearch = false;
+const deepFormData = {
+  name:'', age:'', gender:'여성', height:'', weight:'', chiefComplaint:'', healthSelfAssess:'건강함',
+  stressLevel:'', sleepQuality:'', digestion:'', appetite:'', stool:'', urine:'', coldHeat:'',
+  liverSymptoms:[], heartSymptoms:[], spleenSymptoms:[], lungSymptoms:[], kidneySymptoms:[],
+  history:[], surgery:'없음',
+  periodCycle:'', periodPain:'', periodClots:'', pms:[], discharge:''
+};
+window.updateDeepData = function(key,val){ deepFormData[key]=val; };
+window.updateDeepCheck = function(cat,val,checked){
+  if(checked){ if(!deepFormData[cat].includes(val)) deepFormData[cat].push(val); }
+  else{ deepFormData[cat]=deepFormData[cat].filter(i=>i!==val); }
+};
+window.setDeepSegmented = function(field,val,btnEl){
+  deepFormData[field]=val;
+  const parent=btnEl.parentElement;
+  parent.querySelectorAll('button').forEach(b=>{ b.className="flex-1 py-2 text-[14px] font-medium rounded-[7px] text-[#8E8E93] transition-all duration-200"; });
+  btnEl.className="flex-1 py-2 text-[14px] font-bold rounded-[7px] bg-white shadow-[0_3px_8px_rgba(0,0,0,0.12)] text-blue-700 transition-all duration-200";
+};
+window.setDeepRadio = function(field,val){ deepFormData[field]=val; refreshDeepStep(); };
+
+function deepGetTotalSteps(){ return deepFormData.gender==='여성' ? 5 : 4; }
+
+const DeepUI = {
+  group:(c)=>`<div class="bg-white rounded-[12px] overflow-hidden shadow-sm border border-[#E5E5EA] w-full">${c}</div>`,
+  inputRow:(label,field,placeholder,type="text",suffix="")=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white">
+      <span class="text-[16px] font-semibold text-black">${label}</span>
+      <div class="flex items-center gap-1">
+        <input type="${type}" oninput="updateDeepData('${field}', this.value)" value="${deepFormData[field]}" class="text-right text-[16px] text-[#8E8E93] font-medium outline-none w-40 placeholder:text-gray-300 bg-transparent" placeholder="${placeholder}">
+        ${suffix?`<span class="text-[#8E8E93] font-medium text-[15px]">${suffix}</span>`:''}
+      </div>
+    </div>`,
+  textarea:(field,placeholder)=>`
+    <div class="bg-white rounded-[12px] p-5 shadow-sm border border-[#E5E5EA]">
+      <textarea oninput="updateDeepData('${field}', this.value)" class="w-full h-24 outline-none resize-none text-[16px] font-medium text-black placeholder:text-gray-300 bg-transparent" placeholder="${placeholder}">${deepFormData[field]}</textarea>
+    </div>`,
+  segmentedControl:(field,options)=>`
+    <div class="flex bg-[#F2F2F7] rounded-[9px] p-[3px] w-full">
+      ${options.map(opt=>`<button onclick="setDeepSegmented('${field}', '${opt}', this)" class="flex-1 py-2 text-[14px] rounded-[7px] transition-all duration-200 ${deepFormData[field]===opt?'font-bold bg-white shadow-[0_3px_8px_rgba(0,0,0,0.12)] text-blue-700':'font-medium text-[#8E8E93]'}">${opt}</button>`).join('')}
+    </div>`,
+  radioList:(field,options)=>`<div>${options.map(opt=>`
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white cursor-pointer active:bg-gray-50" onclick="setDeepRadio('${field}','${opt.replace(/'/g,"\\'")}')">
+      <span class="text-[15px] font-semibold text-black">${opt}</span>
+      <div class="w-5 h-5 rounded-full border-2 ${deepFormData[field]===opt?'border-blue-600 bg-blue-600':'border-gray-300'} flex items-center justify-center shrink-0">
+        ${deepFormData[field]===opt?'<div class="w-2 h-2 bg-white rounded-full"></div>':''}
+      </div>
+    </label>`).join('')}</div>`,
+  selectRow:(label,field,options)=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white gap-3">
+      <span class="text-[15px] font-semibold text-black shrink-0">${label}</span>
+      <select onchange="updateDeepData('${field}', this.value)" class="text-right text-[14px] text-[#8E8E93] font-medium outline-none bg-transparent flex-1">
+        <option value="">선택</option>
+        ${options.map(o=>`<option value="${o}" ${deepFormData[field]===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+    </div>`,
+  checkRow:(label,category,value)=>`
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] bg-white cursor-pointer active:bg-gray-50 transition-colors">
+      <span class="text-[15px] font-semibold text-black">${label}</span>
+      <div class="relative flex items-center justify-center">
+        <input type="checkbox" class="sr-only peer" onchange="updateDeepCheck('${category}', '${value}', this.checked)" ${deepFormData[category].includes(value)?'checked':''}>
+        <i data-lucide="check" class="w-6 h-6 text-blue-600 opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></i>
+      </div>
+    </label>`,
+  checkGrid:(items,category)=>`<div class="md:grid md:grid-cols-2 md:divide-x md:divide-[#E5E5EA]">${items.map(v=>DeepUI.checkRow(v,category,v)).join('')}</div>`,
+  header:(t)=>`<h2 class="text-[26px] font-extrabold tracking-tight text-black mb-2 mt-8 px-2 first:mt-0">${t}</h2>`,
+  subhead:(t)=>`<div class="text-[13px] font-bold text-[#8E8E93] uppercase tracking-wider mb-2 mt-6 px-4">${t}</div>`
+};
+
+const DEEP_OPT_LIVER = ['쉽게 피로를 느끼고 잘 지친다','짜증이 많고 화를 자주 낸다','옆구리가 결리거나 아프다','눈이 침침하고 피로하다','근육에 쥐가 잘 난다','어지러움이나 두통이 있다','멍이 잘 든다'];
+const DEEP_OPT_HEART = ['가슴이 두근거리고 자주 놀란다','깊은 잠을 못자고 자주 깬다','건망증이 심하다','안색이 창백하다는 말을 듣는다','손발이 차고 저리다','특정 부위로 땀을 자주 흘린다'];
+const DEEP_OPT_SPLEEN = ['입맛이 없고 속이 늘 더부룩하다','몸이 무겁고 눕기를 좋아한다','생각이 많고 걱정이 많다','멀미를 하거나 구역감이 있다','배가 자주 아프고 설사/변비가 잦다','입술이나 입안이 자주 헌다'];
+const DEEP_OPT_LUNG = ['감기에 자주 걸리고 잘 낫지 않는다','마른 기침, 가래, 콧물이 잦다','온도 변화(추위/더위)에 민감하다','비염, 천식, 아토피 진단을 받은 적 있다','피부가 건조하고 가렵다','목소리에 힘이 없다'];
+const DEEP_OPT_KIDNEY = ['눈 주위가 붓거나 다크써클이 생긴다','소변을 자주 보거나 시원하지 않다','허리나 무릎이 자주 아프다','머리카락 숱이 적거나 힘이 없다','방광염, 신장질환을 앓은 적 있다','귀에서 소리가 난다(이명)'];
+const DEEP_OPT_HISTORY = ['고혈압','당뇨','고지혈증','지방간','갑상선질환','디스크/관절염'];
+const DEEP_OPT_PMS = ['가슴통증/팽만감','아랫배/허리 통증','감정기복/우울','소화불량/변비','두통/어지럼증'];
+
+const deepSections = {
+  2:{ navTitle:'기본 정보', html:()=>`
+    ${DeepUI.header('기본 정보')}
+    ${DeepUI.group(`
+      ${DeepUI.inputRow('성함','name','이름 입력')}
+      ${DeepUI.inputRow('나이','age','0','number','세')}
+      <div class="p-4 px-5 border-b border-[#E5E5EA] bg-white">${DeepUI.segmentedControl('gender',['여성','남성'])}</div>
+      ${DeepUI.inputRow('키','height','0','number','cm')}
+      ${DeepUI.inputRow('체중','weight','0','number','kg')}
+    `)}
+    ${DeepUI.subhead('현재 건강 상태 자가진단')}
+    ${DeepUI.group(DeepUI.radioList('healthSelfAssess',['건강함','보통','허약함','최근 급격히 허약']))}
+    ${DeepUI.subhead('가장 불편한 증상 (주호소)')}
+    ${DeepUI.textarea('chiefComplaint','어디가 가장 불편하신가요?')}
+  `},
+  3:{ navTitle:'생활 습관', html:()=>`
+    ${DeepUI.header('생활 습관 · 전신 상태')}
+    ${DeepUI.subhead('스트레스 정도')}
+    ${DeepUI.group(DeepUI.radioList('stressLevel',['편안함','견딜만함','심함','항상 긴장','매우 심함(우울)']))}
+    ${DeepUI.subhead('수면 습관')}
+    ${DeepUI.group(DeepUI.radioList('sleepQuality',['개운함','꿈이 많음','자주 깸','입면장애(잠들기 힘듦)']))}
+    ${DeepUI.subhead('식사 및 소화')}
+    ${DeepUI.group(`
+      ${DeepUI.selectRow('소화 상태','digestion',['소화 잘됨','소화불량/더부룩','자주 체함','속쓰림/신물'])}
+      ${DeepUI.selectRow('식욕 상태','appetite',['보통','식욕 좋음(과식)','식욕없음','입맛이 씀/없음'])}
+    `)}
+    ${DeepUI.subhead('한열 (추위/더위)')}
+    ${DeepUI.group(DeepUI.radioList('coldHeat',['보통','추위/더위 잘탐','얼굴로 열이 오름','손발이 참']))}
+    ${DeepUI.subhead('대변 · 소변 상태')}
+    ${DeepUI.group(DeepUI.radioList('stool',['정상','변비','설사/묽은변','불규칙']))}
+    ${DeepUI.group(DeepUI.radioList('urine',['정상','자주 봄(빈뇨)','시원찮음/잔뇨감','진하고 냄새남']))}
+  `},
+  4:{ navTitle:'오장 · 과거력', html:()=>`
+    ${DeepUI.header('오장(五臟) 체크')}
+    ${DeepUI.subhead('간(肝) 기능 — 피로, 해독, 근육')}
+    ${DeepUI.group(DeepUI.checkGrid(DEEP_OPT_LIVER,'liverSymptoms'))}
+    ${DeepUI.subhead('심(心) 기능 — 순환, 정신, 수면')}
+    ${DeepUI.group(DeepUI.checkGrid(DEEP_OPT_HEART,'heartSymptoms'))}
+    ${DeepUI.subhead('비(脾) 기능 — 소화, 흡수, 사지')}
+    ${DeepUI.group(DeepUI.checkGrid(DEEP_OPT_SPLEEN,'spleenSymptoms'))}
+    ${DeepUI.subhead('폐(肺) 기능 — 호흡기, 피부, 면역')}
+    ${DeepUI.group(DeepUI.checkGrid(DEEP_OPT_LUNG,'lungSymptoms'))}
+    ${DeepUI.subhead('신(腎) 기능 — 비뇨, 생식, 뼈')}
+    ${DeepUI.group(DeepUI.checkGrid(DEEP_OPT_KIDNEY,'kidneySymptoms'))}
+    ${DeepUI.header('과거 병력 및 수술 이력')}
+    ${DeepUI.group(DeepUI.checkGrid(DEEP_OPT_HISTORY,'history'))}
+    ${DeepUI.subhead('수술 경험')}
+    ${DeepUI.group(DeepUI.radioList('surgery',['없음','있음']))}
+  `},
+  5:{ navTitle:'여성 건강', html:()=>`
+    ${DeepUI.header('여성 건강 체크')}
+    ${DeepUI.subhead('월경 주기')}
+    ${DeepUI.group(DeepUI.radioList('periodCycle',['규칙적','불규칙','희발월경(드뭄)','빈발월경(잦음)']))}
+    ${DeepUI.subhead('생리통 정도')}
+    ${DeepUI.group(DeepUI.radioList('periodPain',['없음','약간(참을만함)','심함(약 복용)','매우 심함']))}
+    ${DeepUI.subhead('혈액 양상 (덩어리)')}
+    ${DeepUI.group(DeepUI.radioList('periodClots',['없음/선홍색','약간 있음','검붉고 덩어리 많음']))}
+    ${DeepUI.subhead('냉/대하 (분비물)')}
+    ${DeepUI.group(DeepUI.radioList('discharge',['없음','약간 있음','많음','냄새/가려움']))}
+    ${DeepUI.subhead('월경 전 증후군 (PMS)')}
+    ${DeepUI.group(DeepUI.checkGrid(DEEP_OPT_PMS,'pms'))}
+  `}
+};
+
+function deepRenderProgress(){
+  const fill=document.getElementById('deep-progress-fill');
+  const total=deepGetTotalSteps();
+  const pct = deepCurrentStep<=1 ? 0 : ((deepCurrentStep-1)/total)*100;
+  fill.style.width=pct+'%';
+}
+function refreshDeepStep(){
+  if(deepCurrentStep===1) return;
+  const container=document.getElementById('deep-dynamic-container');
+  container.innerHTML = deepSections[deepCurrentStep].html();
+  if(window.lucide) lucide.createIcons();
+  deepRenderProgress();
+}
+window.deepUpdateUI = function(){
+  triggerFadeIn(document.getElementById('deep-dynamic-container'));
+  document.querySelectorAll('.deep-step-content').forEach(s=>s.classList.remove('active'));
+  const bottomAction=document.getElementById('deep-bottom-action'), nextBtn=document.getElementById('deep-next-btn'),
+        backLabel=document.getElementById('deep-btn-back-label'), navTitle=document.getElementById('deep-nav-title'),
+        scrollContainer=document.getElementById('deep-scroll-container');
+  if(deepCurrentStep===1){
+    document.getElementById('deep-step-1').classList.add('active');
+    bottomAction.classList.add('hidden'); backLabel.innerText='메인으로'; navTitle.innerText='소개';
+  } else {
+    const config=deepSections[deepCurrentStep];
+    const container=document.getElementById('deep-dynamic-container');
+    container.innerHTML=config.html(); container.classList.add('active');
+    bottomAction.classList.remove('hidden'); backLabel.innerText='이전'; navTitle.innerText=config.navTitle;
+    nextBtn.innerText = (deepCurrentStep===deepGetTotalSteps()) ? '완료 및 리포트 생성' : '다음 단계';
+  }
+  deepRenderProgress(); if(window.lucide) lucide.createIcons();
+  if(scrollContainer) scrollContainer.scrollTo(0,0);
+};
+window.deepNextStep = function(){ if(deepCurrentStep<deepGetTotalSteps()){ deepCurrentStep++; deepUpdateUI(); } else { generateDeepReportAndShow(); } };
+window.deepPrevStep = function(){ if(deepCurrentStep>1){ deepCurrentStep--; deepUpdateUI(); } else { document.getElementById('deep-app-shell').style.display='none'; returnToHub(); } };
+window.enterDeepSurvey = function(){
+  document.getElementById('hub-view').style.display='none';
+  const shell=document.getElementById('deep-app-shell'); shell.style.display='flex'; triggerFadeIn(shell);
+  deepCurrentStep=1; deepUpdateUI();
+};
+window.deepBackToForm = function(){
+  document.getElementById('deep-report-view').classList.remove('active');
+  if(deepCameFromSearch){
+    deepCameFromSearch=false;
+    document.getElementById('search-view').style.display='block';
+  } else {
+    document.getElementById('deep-app-shell').style.display='flex';
+    deepCurrentStep=deepGetTotalSteps(); deepUpdateUI();
+  }
+};
+
+/* ----- H-SCALE 스코어링 (증상강도 계산 후, 건강도=100-강도 로 환산) ----- */
+function calcDeepOrganHealth(){
+  const f=deepFormData; let s={liver:20,heart:20,spleen:20,lung:20,kidney:20}; const w=15;
+  s.liver += f.liverSymptoms.length*w;
+  if(f.stressLevel==='심함'||f.stressLevel==='매우 심함(우울)') s.liver+=15;
+  if(f.pms.includes('감정기복/우울')) s.liver+=10;
+  s.heart += f.heartSymptoms.length*w;
+  if(f.sleepQuality==='자주 깸'||f.sleepQuality==='입면장애(잠들기 힘듦)') s.heart+=15;
+  if(f.stressLevel==='항상 긴장') s.heart+=10;
+  s.spleen += f.spleenSymptoms.length*w;
+  if(f.digestion && f.digestion!=='소화 잘됨') s.spleen+=10;
+  if(f.appetite==='식욕없음') s.spleen+=10;
+  if(f.stool==='설사/묽은변') s.spleen+=10;
+  s.lung += f.lungSymptoms.length*w;
+  if(f.coldHeat==='추위/더위 잘탐') s.lung+=15;
+  if(f.lungSymptoms.includes('비염, 천식, 아토피 진단을 받은 적 있다')) s.lung+=15;
+  s.kidney += f.kidneySymptoms.length*w;
+  if(f.urine && f.urine!=='정상') s.kidney+=10;
+  if(f.coldHeat==='추위/더위 잘탐') s.kidney+=5;
+  if(f.kidneySymptoms.includes('방광염, 신장질환을 앓은 적 있다')) s.kidney+=15;
+  Object.keys(s).forEach(k=>{ if(s[k]>100) s[k]=100; });
+  const health = {};
+  Object.entries(s).forEach(([k,v])=>{ health[k]=Math.max(8, 120-v); });
+  return { '간':health.liver, '심':health.heart, '비':health.spleen, '폐':health.lung, '신':health.kidney };
+}
+function calcDeepQiBloodWater(){
+  const f=deepFormData; let s={qiDef:20,qiRev:20,qiStag:20,bloodDef:20,bloodStasis:20,dampness:20,yinDef:20};
+  if(f.liverSymptoms.includes('쉽게 피로를 느끼고 잘 지친다')) s.qiDef+=20;
+  if(f.lungSymptoms.includes('목소리에 힘이 없다')) s.qiDef+=15;
+  if(f.spleenSymptoms.includes('몸이 무겁고 눕기를 좋아한다')) s.qiDef+=15;
+  if(f.healthSelfAssess==='허약함'||f.healthSelfAssess==='최근 급격히 허약') s.qiDef+=15;
+  if(f.appetite==='식욕없음') s.qiDef+=10;
+  if(f.spleenSymptoms.includes('멀미를 하거나 구역감이 있다')) s.qiRev+=25;
+  if(f.lungSymptoms.includes('마른 기침, 가래, 콧물이 잦다')) s.qiRev+=20;
+  if(f.coldHeat==='얼굴로 열이 오름') s.qiRev+=20;
+  if(f.heartSymptoms.includes('가슴이 두근거리고 자주 놀란다')) s.qiRev+=10;
+  if(f.liverSymptoms.includes('짜증이 많고 화를 자주 낸다')) s.qiStag+=20;
+  if(f.liverSymptoms.includes('옆구리가 결리거나 아프다')) s.qiStag+=15;
+  if(f.heartSymptoms.includes('가슴이 두근거리고 자주 놀란다')) s.qiStag+=10;
+  if(f.stressLevel==='심함'||f.stressLevel==='항상 긴장') s.qiStag+=20;
+  if(f.pms.includes('가슴통증/팽만감')) s.qiStag+=15;
+  if(f.liverSymptoms.includes('어지러움이나 두통이 있다')) s.bloodDef+=20;
+  if(f.heartSymptoms.includes('안색이 창백하다는 말을 듣는다')) s.bloodDef+=20;
+  if(f.heartSymptoms.includes('손발이 차고 저리다')) s.bloodDef+=15;
+  if(f.kidneySymptoms.includes('머리카락 숱이 적거나 힘이 없다')) s.bloodDef+=10;
+  if(f.liverSymptoms.includes('눈이 침침하고 피로하다')) s.bloodDef+=15;
+  if(f.liverSymptoms.includes('멍이 잘 든다')) s.bloodStasis+=20;
+  if(f.periodClots==='검붉고 덩어리 많음') s.bloodStasis+=25;
+  if(f.periodPain==='심함(약 복용)'||f.periodPain==='매우 심함') s.bloodStasis+=20;
+  if(f.pms.includes('아랫배/허리 통증')) s.bloodStasis+=10;
+  if(f.surgery==='있음') s.bloodStasis+=10;
+  if(f.spleenSymptoms.includes('몸이 무겁고 눕기를 좋아한다')) s.dampness+=20;
+  if(f.kidneySymptoms.includes('눈 주위가 붓거나 다크써클이 생긴다')) s.dampness+=20;
+  if(f.stool==='설사/묽은변') s.dampness+=15;
+  if(f.discharge==='많음'||f.discharge==='냄새/가려움') s.dampness+=15;
+  if(f.lungSymptoms.includes('마른 기침, 가래, 콧물이 잦다')) s.dampness+=10;
+  if(f.coldHeat==='얼굴로 열이 오름') s.yinDef+=20;
+  if(f.kidneySymptoms.includes('귀에서 소리가 난다(이명)')) s.yinDef+=15;
+  if(f.urine==='진하고 냄새남') s.yinDef+=15;
+  if(f.lungSymptoms.includes('피부가 건조하고 가렵다')) s.yinDef+=15;
+  if(f.sleepQuality==='입면장애(잠들기 힘듦)') s.yinDef+=10;
+  Object.keys(s).forEach(k=>{ if(s[k]>100) s[k]=100; if(s[k]<20) s[k]=20; });
+  const h={}; Object.entries(s).forEach(([k,v])=>{ h[k]=Math.max(8,120-v); });
+  return { '기허':h.qiDef, '기역':h.qiRev, '기울':h.qiStag, '혈허':h.bloodDef, '어혈':h.bloodStasis, '수체':h.dampness, '음허':h.yinDef };
+}
+
+function generateDeepReportAndShow(skipSave){
+  const f=deepFormData, isFemale=f.gender==='여성', todayStr=new Date().toLocaleDateString('ko-KR');
+  document.title = `${(f.name||'이름미상').replace(/\s+/g,'')}_심층진료_${new Date().toISOString().slice(0,10).replace(/-/g,'')}`;
+
+  document.getElementById('deep-rp-name').innerText=f.name||'미입력';
+  document.getElementById('deep-rp-age').innerText=`${f.gender} · ${f.age||'?'}세`;
+  document.getElementById('deep-rp-body').innerText=`${f.height||'0'}cm / ${f.weight||'0'}kg`;
+  document.getElementById('deep-rp-selfassess').innerText=f.healthSelfAssess||'-';
+  document.getElementById('deep-rp-date').innerText=todayStr;
+  document.getElementById('deep-rp-complaint').innerText=f.chiefComplaint||'특이 호소 증상 없음';
+  document.getElementById('deep-rp-footer-1').innerText=`측정일: ${todayStr}`;
+  document.getElementById('deep-rp-footer-2').innerText=`측정일: ${todayStr}`;
+  document.getElementById('deep-badge-1').innerText='1 / 2';
+
+  const organ=calcDeepOrganHealth(), qhs=calcDeepQiBloodWater();
+  drawRadar(organ,'deep-rp-radar'); drawRadar(qhs,'deep-rp-qhs-radar');
+  const organModern={'간':'피로회복·해독','심':'순환·정신·수면','비':'소화·흡수','폐':'호흡·면역','신':'생식·비뇨·뼈'};
+  const qhsModern={'기허':'기운부족','기역':'기운상충','기울':'스트레스','혈허':'혈액부족','어혈':'혈액순환','수체':'부종·담음','음허':'진액부족'};
+  renderLegend('deep-rp-organ-legend', organ, organModern);
+  renderLegend('deep-rp-qhs-legend', qhs, qhsModern);
+
+  const organAvg = Object.values(organ).reduce((a,b)=>a+b,0)/Object.values(organ).length;
+  const qhsAvg = Object.values(qhs).reduce((a,b)=>a+b,0)/Object.values(qhs).length;
+  const hscaleScore = Math.round((organAvg+qhsAvg)/2);
+  let grade='관찰필요', color='#dc2626';
+  if(hscaleScore>=80){ grade='우수'; color='#16a34a'; }
+  else if(hscaleScore>=60){ grade='양호'; color='#65a30d'; }
+  else if(hscaleScore>=40){ grade='보통'; color='#d97706'; }
+  document.getElementById('deep-hscale-score').innerText=hscaleScore;
+  document.getElementById('deep-hscale-ring').style.background=`conic-gradient(${color} ${hscaleScore}%, #E5E5EA 0)`;
+  document.getElementById('deep-hscale-grade').innerText=`종합 건강 스코어 ${hscaleScore}점 · ${grade}`;
+
+  const lifestyleLines=[];
+  if(f.stressLevel) lifestyleLines.push(`스트레스: ${f.stressLevel}`);
+  if(f.sleepQuality) lifestyleLines.push(`수면: ${f.sleepQuality}`);
+  if(f.digestion||f.appetite) lifestyleLines.push(`소화/식욕: ${f.digestion||'-'} · ${f.appetite||'-'}`);
+  if(f.stool||f.urine) lifestyleLines.push(`대소변: ${f.stool||'-'} · ${f.urine||'-'}`);
+  if(f.coldHeat) lifestyleLines.push(`한열: ${f.coldHeat}`);
+  document.getElementById('deep-rp-lifestyle').innerHTML = lifestyleLines.length ? lifestyleLines.map(l=>`<div class="mb-1.5">• ${l}</div>`).join('') : '<div>입력된 생활습관 정보가 없습니다.</div>';
+
+  const womenCard=document.getElementById('deep-rp-women-card');
+  if(isFemale){
+    womenCard.style.display='block';
+    document.getElementById('deep-rp-women').innerHTML = `
+      <div class="mb-1.5">• 월경 주기: ${f.periodCycle||'-'} · 생리통: ${f.periodPain||'-'}</div>
+      <div class="mb-1.5">• 혈액 양상: ${f.periodClots||'-'} · 냉/대하: ${f.discharge||'-'}</div>
+      <div>• PMS: ${f.pms.length?f.pms.join(', '):'해당 없음'}</div>`;
+  } else { womenCard.style.display='none'; }
+
+  document.getElementById('deep-rp-history').innerHTML = `
+    <div class="mb-1.5">• 과거 병력: ${f.history.length?f.history.join(', '):'해당 없음'}</div>
+    <div>• 수술 경험: ${f.surgery}</div>`;
+
+  const weakestOrgan=Object.entries(organ).sort((a,b)=>a[1]-b[1])[0];
+  const weakestQhs=Object.entries(qhs).sort((a,b)=>a[1]-b[1])[0];
+  document.getElementById('deep-rp-overall').innerText =
+    `주호소 "${f.chiefComplaint||'특이 증상 없음'}"과 문진 응답을 종합하면 오장 중 ${weakestOrgan[0]}(${organModern[weakestOrgan[0]]}) 계통과, 변증상 ${weakestQhs[0]}(${qhsModern[weakestQhs[0]]}) 경향이 상대적으로 두드러집니다. 진료실에서 체질에 맞는 처방과 관리 계획을 안내해 드리겠습니다.`;
+
+  document.getElementById('deep-app-shell').style.display='none';
+  const _rv=document.getElementById('deep-report-view'); _rv.classList.add('active'); triggerFadeIn(_rv.querySelector('.report-scroll'));
+  if(window.lucide) lucide.createIcons();
+  const statusEl=document.getElementById('deep-save-status'); if(statusEl) statusEl.innerText='';
+  if(!skipSave) saveDeepRecordToSheet();
+}
+
+function saveDeepRecordToSheet(){
+  const statusEl=document.getElementById('deep-save-status');
+  if(!isSheetConfigured()){ if(statusEl) statusEl.innerText='저장소 미설정'; return; }
+  if(statusEl) statusEl.innerText='저장 중...';
+  const payload = { category:'심층진료', name: deepFormData.name, birthDate: deepFormData.age, gender: deepFormData.gender, ageGroup:'', formData: deepFormData };
+  fetch(CONFIG.SHEET_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
+    .then(()=>{ if(statusEl) statusEl.innerText='저장 요청 완료 ✓'; })
+    .catch((err)=>{ console.error('저장 실패:',err); if(statusEl) statusEl.innerText='저장 실패 - 설정을 확인해 주세요'; });
+}
+
+/* ===================== 다이어트 (H-SCORE) 모듈 ===================== */
+let dietCurrentStep = 1;
+let dietCameFromSearch = false;
+const dietFormData = {
+  name:'', gender:'여성', targetWeight:'', maritalStatus:'', dietReason:'',
+  obesityTxHistory:'', familyHistory:[],
+  caffeineSymptoms:[], stressLevel:'', workStyle:[],
+  eatingHabits:[], appetitePattern:[],
+  sleepTime:'', wakeTime:'', sleepHabits:[],
+  sysLiver:[], sysHeart:[], sysSpleen:[], sysLung:[], sysKidney:[],
+  periodCycle:'', periodFlow:'', periodPain:'', periodClots:''
+};
+window.updateDietData = function(key,val){ dietFormData[key]=val; };
+window.updateDietCheck = function(cat,val,checked){
+  if(checked){ if(!dietFormData[cat].includes(val)) dietFormData[cat].push(val); }
+  else{ dietFormData[cat]=dietFormData[cat].filter(i=>i!==val); }
+};
+window.setDietSegmented = function(field,val,btnEl){
+  dietFormData[field]=val;
+  const parent=btnEl.parentElement;
+  parent.querySelectorAll('button').forEach(b=>{ b.className="flex-1 py-2 text-[14px] font-medium rounded-[7px] text-[#8E8E93] transition-all duration-200"; });
+  btnEl.className="flex-1 py-2 text-[14px] font-bold rounded-[7px] bg-white shadow-[0_3px_8px_rgba(0,0,0,0.12)] text-orange-600 transition-all duration-200";
+};
+window.setDietRadio = function(field,val){ dietFormData[field]=val; refreshDietStep(); };
+
+function dietGetTotalSteps(){ return dietFormData.gender==='여성' ? 5 : 4; }
+
+const DietUI = {
+  group:(c)=>`<div class="bg-white rounded-[12px] overflow-hidden shadow-sm border border-[#E5E5EA] w-full">${c}</div>`,
+  inputRow:(label,field,placeholder,type="text",suffix="")=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white">
+      <span class="text-[16px] font-semibold text-black">${label}</span>
+      <div class="flex items-center gap-1">
+        <input type="${type}" oninput="updateDietData('${field}', this.value)" value="${dietFormData[field]}" class="text-right text-[16px] text-[#8E8E93] font-medium outline-none w-40 placeholder:text-gray-300 bg-transparent" placeholder="${placeholder}">
+        ${suffix?`<span class="text-[#8E8E93] font-medium text-[15px]">${suffix}</span>`:''}
+      </div>
+    </div>`,
+  textarea:(field,placeholder)=>`
+    <div class="bg-white rounded-[12px] p-5 shadow-sm border border-[#E5E5EA]">
+      <textarea oninput="updateDietData('${field}', this.value)" class="w-full h-24 outline-none resize-none text-[16px] font-medium text-black placeholder:text-gray-300 bg-transparent" placeholder="${placeholder}">${dietFormData[field]}</textarea>
+    </div>`,
+  segmentedControl:(field,options)=>`
+    <div class="flex bg-[#F2F2F7] rounded-[9px] p-[3px] w-full">
+      ${options.map(opt=>`<button onclick="setDietSegmented('${field}', '${opt}', this)" class="flex-1 py-2 text-[14px] rounded-[7px] transition-all duration-200 ${dietFormData[field]===opt?'font-bold bg-white shadow-[0_3px_8px_rgba(0,0,0,0.12)] text-orange-600':'font-medium text-[#8E8E93]'}">${opt}</button>`).join('')}
+    </div>`,
+  radioList:(field,options)=>`<div>${options.map(opt=>`
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white cursor-pointer active:bg-gray-50" onclick="setDietRadio('${field}','${opt.replace(/'/g,"\\'")}')">
+      <span class="text-[15px] font-semibold text-black">${opt}</span>
+      <div class="w-5 h-5 rounded-full border-2 ${dietFormData[field]===opt?'border-orange-500 bg-orange-500':'border-gray-300'} flex items-center justify-center shrink-0">
+        ${dietFormData[field]===opt?'<div class="w-2 h-2 bg-white rounded-full"></div>':''}
+      </div>
+    </label>`).join('')}</div>`,
+  checkRow:(label,category,value)=>`
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] bg-white cursor-pointer active:bg-gray-50 transition-colors">
+      <span class="text-[15px] font-semibold text-black">${label}</span>
+      <div class="relative flex items-center justify-center">
+        <input type="checkbox" class="sr-only peer" onchange="updateDietCheck('${category}', '${value}', this.checked)" ${dietFormData[category].includes(value)?'checked':''}>
+        <i data-lucide="check" class="w-6 h-6 text-orange-500 opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></i>
+      </div>
+    </label>`,
+  checkGrid:(items,category)=>`<div class="md:grid md:grid-cols-2 md:divide-x md:divide-[#E5E5EA]">${items.map(v=>DietUI.checkRow(v,category,v)).join('')}</div>`,
+  header:(t)=>`<h2 class="text-[26px] font-extrabold tracking-tight text-black mb-2 mt-8 px-2 first:mt-0">${t}</h2>`,
+  subhead:(t)=>`<div class="text-[13px] font-bold text-[#8E8E93] uppercase tracking-wider mb-2 mt-6 px-4">${t}</div>`
+};
+
+const DIET_OPT_LIVER = ['쉽게 피로함','어지럼/두통','짜증/화가 많음','근육통','눈 침침함'];
+const DIET_OPT_HEART = ['안색 창백','가슴 두근거림','잘 놀람','자주 깸','손발 냉증'];
+const DIET_OPT_SPLEEN = ['입맛 없음','건망증','멀미','복통/설사','잘 체함'];
+const DIET_OPT_LUNG = ['잦은 감기','기침/가래','비염/천식','피부 건조'];
+const DIET_OPT_KIDNEY = ['부종','다크서클','소변 이상','탈모/모발 약함'];
+
+const dietSections = {
+  2:{ navTitle:'다이어트 목표', html:()=>`
+    ${DietUI.header('다이어트 목표')}
+    ${DietUI.group(`
+      ${DietUI.inputRow('성함','name','이름 입력')}
+      <div class="p-4 px-5 border-b border-[#E5E5EA] bg-white">${DietUI.segmentedControl('gender',['여성','남성'])}</div>
+      ${DietUI.inputRow('희망 체중','targetWeight','0','number','kg')}
+    `)}
+    ${DietUI.subhead('결혼 유무')}
+    ${DietUI.group(DietUI.radioList('maritalStatus',['미혼','기혼']))}
+    ${DietUI.subhead('다이어트를 꼭 해야 하는 이유')}
+    ${DietUI.textarea('dietReason','예: 건강 회복, 결혼 준비 등')}
+    ${DietUI.subhead('비만 치료 경험')}
+    ${DietUI.group(DietUI.radioList('obesityTxHistory',['없음','양약','한약','시술']))}
+    ${DietUI.subhead('가족력 / 질환 (다중 선택)')}
+    ${DietUI.group(DietUI.checkGrid(['고혈압','당뇨','고지혈증','신장질환','지방간'],'familyHistory'))}
+    ${DietUI.subhead('카페인 반응 (커피/녹차, 다중 선택)')}
+    ${DietUI.group(DietUI.checkGrid(['어지러움','불면','두통','손떨림','가슴 두근거림'],'caffeineSymptoms'))}
+  `},
+  3:{ navTitle:'생활 습관', html:()=>`
+    ${DietUI.header('생활 및 스트레스')}
+    ${DietUI.subhead('스트레스 정도')}
+    ${DietUI.group(DietUI.radioList('stressLevel',['낮음','보통','심함','매우 심함']))}
+    ${DietUI.subhead('근무/생활 스타일 (다중 선택)')}
+    ${DietUI.group(DietUI.checkGrid(['출퇴근 자유','야근 잦음','회식 잦음','활동량 적음'],'workStyle'))}
+    ${DietUI.header('식습관 분석')}
+    ${DietUI.subhead('식습관 (다중 선택)')}
+    ${DietUI.group(DietUI.checkGrid(['식사 즐거움','입이 짧음','편식 심함','과식/폭식','아침 거름','야식 즐김'],'eatingHabits'))}
+    ${DietUI.subhead('식욕 패턴 (다중 선택)')}
+    ${DietUI.group(DietUI.checkGrid(['배 불러도 먹음','배 고플 때만 먹음','스트레스로 먹음'],'appetitePattern'))}
+    ${DietUI.header('수면 상태')}
+    ${DietUI.group(`
+      ${DietUI.inputRow('취침 시각','sleepTime','예: 23:00')}
+      ${DietUI.inputRow('기상 시각','wakeTime','예: 07:00')}
+    `)}
+    ${DietUI.subhead('수면 습관 (다중 선택)')}
+    ${DietUI.group(DietUI.checkGrid(['혼자 잠','함께 잠','코골이','꿈이 많음'],'sleepHabits'))}
+  `},
+  4:{ navTitle:'장부 체크', html:()=>`
+    ${DietUI.header('장부(五臟) 체크')}
+    ${DietUI.subhead('간(肝) — 피로')}
+    ${DietUI.group(DietUI.checkGrid(DIET_OPT_LIVER,'sysLiver'))}
+    ${DietUI.subhead('심(心) — 정신')}
+    ${DietUI.group(DietUI.checkGrid(DIET_OPT_HEART,'sysHeart'))}
+    ${DietUI.subhead('비(脾) — 소화')}
+    ${DietUI.group(DietUI.checkGrid(DIET_OPT_SPLEEN,'sysSpleen'))}
+    ${DietUI.subhead('폐(肺) — 호흡')}
+    ${DietUI.group(DietUI.checkGrid(DIET_OPT_LUNG,'sysLung'))}
+    ${DietUI.subhead('신(腎) — 비뇨')}
+    ${DietUI.group(DietUI.checkGrid(DIET_OPT_KIDNEY,'sysKidney'))}
+  `},
+  5:{ navTitle:'여성 건강', html:()=>`
+    ${DietUI.header('여성 건강 (해당자만)')}
+    ${DietUI.subhead('월경 주기')}
+    ${DietUI.group(DietUI.inputRow('주기','periodCycle','예: 28일'))}
+    ${DietUI.subhead('월경량')}
+    ${DietUI.group(DietUI.radioList('periodFlow',['적음','보통','많음']))}
+    ${DietUI.subhead('월경통')}
+    ${DietUI.group(DietUI.radioList('periodPain',['없음','약간','심함']))}
+    ${DietUI.subhead('혈괴(덩어리)')}
+    ${DietUI.group(DietUI.radioList('periodClots',['없음','약간','많음']))}
+  `}
+};
+
+function dietRenderProgress(){
+  const fill=document.getElementById('diet-progress-fill');
+  const total=dietGetTotalSteps();
+  const pct = dietCurrentStep<=1 ? 0 : ((dietCurrentStep-1)/total)*100;
+  fill.style.width=pct+'%';
+}
+function refreshDietStep(){
+  if(dietCurrentStep===1) return;
+  const container=document.getElementById('diet-dynamic-container');
+  container.innerHTML = dietSections[dietCurrentStep].html();
+  if(window.lucide) lucide.createIcons();
+  dietRenderProgress();
+}
+window.dietUpdateUI = function(){
+  triggerFadeIn(document.getElementById('diet-dynamic-container'));
+  document.querySelectorAll('.diet-step-content').forEach(s=>s.classList.remove('active'));
+  const bottomAction=document.getElementById('diet-bottom-action'), nextBtn=document.getElementById('diet-next-btn'),
+        backLabel=document.getElementById('diet-btn-back-label'), navTitle=document.getElementById('diet-nav-title'),
+        scrollContainer=document.getElementById('diet-scroll-container');
+  if(dietCurrentStep===1){
+    document.getElementById('diet-step-1').classList.add('active');
+    bottomAction.classList.add('hidden'); backLabel.innerText='메인으로'; navTitle.innerText='소개';
+  } else {
+    const config=dietSections[dietCurrentStep];
+    const container=document.getElementById('diet-dynamic-container');
+    container.innerHTML=config.html(); container.classList.add('active');
+    bottomAction.classList.remove('hidden'); backLabel.innerText='이전'; navTitle.innerText=config.navTitle;
+    nextBtn.innerText = (dietCurrentStep===dietGetTotalSteps()) ? '완료 및 리포트 생성' : '다음 단계';
+  }
+  dietRenderProgress(); if(window.lucide) lucide.createIcons();
+  if(scrollContainer) scrollContainer.scrollTo(0,0);
+};
+window.dietNextStep = function(){ if(dietCurrentStep<dietGetTotalSteps()){ dietCurrentStep++; dietUpdateUI(); } else { generateDietReportAndShow(); } };
+window.dietPrevStep = function(){ if(dietCurrentStep>1){ dietCurrentStep--; dietUpdateUI(); } else { document.getElementById('diet-app-shell').style.display='none'; returnToHub(); } };
+window.enterDietSurvey = function(){
+  document.getElementById('hub-view').style.display='none';
+  const shell=document.getElementById('diet-app-shell'); shell.style.display='flex'; triggerFadeIn(shell);
+  dietCurrentStep=1; dietUpdateUI();
+};
+window.dietBackToForm = function(){
+  document.getElementById('diet-report-view').classList.remove('active');
+  if(dietCameFromSearch){
+    dietCameFromSearch=false;
+    document.getElementById('search-view').style.display='block';
+  } else {
+    document.getElementById('diet-app-shell').style.display='flex';
+    dietCurrentStep=dietGetTotalSteps(); dietUpdateUI();
+  }
+};
+
+/* ----- H-SCORE 스코어링 (증상강도 계산 후, 건강도=100-강도 로 환산) ----- */
+function calcDietOrganHealth(){
+  const f=dietFormData;
+  return {
+    '간': healthScore(f.sysLiver, DIET_OPT_LIVER.length),
+    '심': healthScore(f.sysHeart, DIET_OPT_HEART.length),
+    '비': healthScore(f.sysSpleen, DIET_OPT_SPLEEN.length),
+    '폐': healthScore(f.sysLung, DIET_OPT_LUNG.length),
+    '신': healthScore(f.sysKidney, DIET_OPT_KIDNEY.length)
+  };
+}
+function calcDietQiBloodWater(){
+  const f=dietFormData;
+  const norm=(v)=>Math.max(8, 120-Math.min(100,Math.max(20,v)));
+  const qiDef = 20 + ((f.sysLiver.includes('쉽게 피로함')?20:0) + (f.sysSpleen.includes('입맛 없음')||f.sysSpleen.includes('잘 체함')?20:0) + (f.sysLung.includes('잦은 감기')?20:0) + (f.sysHeart.includes('안색 창백')?20:0));
+  const qiStag = 20 + ((f.stressLevel==='심함'||f.stressLevel==='매우 심함'?30:0) + (f.sysLiver.includes('짜증/화가 많음')?30:0));
+  const qiRev = 20 + ((f.sysSpleen.includes('멀미')?30:0) + (f.sysHeart.includes('가슴 두근거림')?20:0) + (f.sysHeart.includes('잘 놀람')?20:0));
+  const bloodDef = 20 + ((f.sysLiver.includes('어지럼/두통')?20:0) + (f.sysLiver.includes('눈 침침함')?20:0) + (f.sysHeart.includes('손발 냉증')?20:0) + (f.periodFlow==='적음'?20:0));
+  const bloodStasis = 20 + ((f.sysLiver.includes('근육통')?20:0) + (f.sysKidney.includes('다크서클')?20:0) + (f.periodClots==='많음'?30:(f.periodClots==='약간'?10:0)) + (f.periodPain==='심함'?20:0));
+  const fluid = 20 + ((f.sysKidney.includes('부종')?30:0) + (f.sysLung.includes('기침/가래')?20:0) + (f.sysSpleen.includes('복통/설사')?20:0));
+  const yinDef = 20 + ((f.sysLung.includes('피부 건조')?20:0) + (f.sysKidney.includes('탈모/모발 약함')?20:0) + (f.sysSpleen.includes('건망증')?20:0));
+  return { '기허':norm(qiDef), '기울':norm(qiStag), '기역':norm(qiRev), '혈허':norm(bloodDef), '어혈':norm(bloodStasis), '수체':norm(fluid), '음허':norm(yinDef) };
+}
+
+function generateDietReportAndShow(skipSave){
+  const f=dietFormData, isFemale=f.gender==='여성', todayStr=new Date().toLocaleDateString('ko-KR');
+  document.title = `${(f.name||'이름미상').replace(/\s+/g,'')}_다이어트_${new Date().toISOString().slice(0,10).replace(/-/g,'')}`;
+
+  document.getElementById('diet-rp-name').innerText=f.name||'미입력';
+  document.getElementById('diet-rp-gender').innerText=f.gender;
+  document.getElementById('diet-rp-target').innerText=f.targetWeight?`${f.targetWeight}kg`:'-';
+  document.getElementById('diet-rp-reason').innerText=f.dietReason||'-';
+  document.getElementById('diet-rp-date').innerText=todayStr;
+  document.getElementById('diet-rp-footer-1').innerText=`측정일: ${todayStr}`;
+  document.getElementById('diet-rp-footer-2').innerText=`측정일: ${todayStr}`;
+  document.getElementById('diet-badge-1').innerText='1 / 2';
+
+  const organ=calcDietOrganHealth(), qhs=calcDietQiBloodWater();
+  drawRadar(organ,'diet-rp-radar'); drawRadar(qhs,'diet-rp-qhs-radar');
+  const organModern={'간':'피로회복·해독','심':'순환·정신','비':'소화·대사','폐':'호흡·면역','신':'생식·비뇨'};
+  const qhsModern={'기허':'기운부족','기울':'스트레스','기역':'기운상충','혈허':'혈액부족','어혈':'혈액순환','수체':'부종·담음','음허':'진액부족'};
+  renderLegend('diet-rp-organ-legend', organ, organModern);
+  renderLegend('diet-rp-qhs-legend', qhs, qhsModern);
+
+  const organAvg = Object.values(organ).reduce((a,b)=>a+b,0)/Object.values(organ).length;
+  const qhsAvg = Object.values(qhs).reduce((a,b)=>a+b,0)/Object.values(qhs).length;
+  const hscore = Math.round((organAvg+qhsAvg)/2);
+  let grade='관찰필요', color='#dc2626';
+  if(hscore>=80){ grade='우수'; color='#16a34a'; }
+  else if(hscore>=60){ grade='양호'; color='#65a30d'; }
+  else if(hscore>=40){ grade='보통'; color='#d97706'; }
+  document.getElementById('diet-hscore-score').innerText=hscore;
+  document.getElementById('diet-hscore-ring').style.background=`conic-gradient(${color} ${hscore}%, #E5E5EA 0)`;
+  document.getElementById('diet-hscore-grade').innerText=`종합 건강 스코어 ${hscore}점 · ${grade}`;
+
+  const lifestyleLines=[];
+  if(f.stressLevel) lifestyleLines.push(`스트레스: ${f.stressLevel}`);
+  if(f.eatingHabits.length) lifestyleLines.push(`식습관: ${f.eatingHabits.join(', ')}`);
+  if(f.appetitePattern.length) lifestyleLines.push(`식욕 패턴: ${f.appetitePattern.join(', ')}`);
+  if(f.sleepTime||f.wakeTime) lifestyleLines.push(`수면: 취침 ${f.sleepTime||'-'} · 기상 ${f.wakeTime||'-'}`);
+  if(f.sleepHabits.length) lifestyleLines.push(`수면 습관: ${f.sleepHabits.join(', ')}`);
+  if(f.caffeineSymptoms.length) lifestyleLines.push(`카페인 반응: ${f.caffeineSymptoms.join(', ')}`);
+  document.getElementById('diet-rp-lifestyle').innerHTML = lifestyleLines.length ? lifestyleLines.map(l=>`<div class="mb-1.5">• ${l}</div>`).join('') : '<div>입력된 생활습관 정보가 없습니다.</div>';
+
+  const womenCard=document.getElementById('diet-rp-women-card');
+  if(isFemale && (f.periodCycle||f.periodFlow||f.periodPain||f.periodClots)){
+    womenCard.style.display='block';
+    document.getElementById('diet-rp-women').innerHTML = `
+      <div class="mb-1.5">• 월경 주기: ${f.periodCycle||'-'} · 월경량: ${f.periodFlow||'-'}</div>
+      <div>• 월경통: ${f.periodPain||'-'} · 혈괴: ${f.periodClots||'-'}</div>`;
+  } else { womenCard.style.display='none'; }
+
+  document.getElementById('diet-rp-history').innerHTML = `
+    <div class="mb-1.5">• 비만 치료 경험: ${f.obesityTxHistory||'-'}</div>
+    <div>• 가족력: ${f.familyHistory.length?f.familyHistory.join(', '):'해당 없음'}</div>`;
+
+  document.getElementById('diet-rp-tips').innerHTML = [
+    '초저칼로리·무리한 절식보다 단백질·채소 중심의 균형 잡힌 식사를 규칙적인 시간에 하는 것이 요요 없이 감량하는 데 도움이 됩니다.',
+    '물을 충분히 섭취하고, 카페인·야식 습관을 서서히 줄여나가는 것이 체질 개선에 도움이 됩니다.',
+    '유산소 운동과 근력 운동을 함께 병행하면 기초대사량 유지에 유리합니다.',
+    '수면이 부족하면 식욕 조절 호르몬 균형이 무너지기 쉬우니, 규칙적인 수면 시간을 지켜주세요.'
+  ].map(t=>`<div class="mb-1.5">• ${t}</div>`).join('');
+
+  const weakestOrgan=Object.entries(organ).sort((a,b)=>a[1]-b[1])[0];
+  const weakestQhs=Object.entries(qhs).sort((a,b)=>a[1]-b[1])[0];
+  document.getElementById('diet-rp-overall').innerText =
+    `"${f.dietReason||'다이어트 목표'}"를 위한 문진 응답을 종합하면 오장 중 ${weakestOrgan[0]}(${organModern[weakestOrgan[0]]}) 계통과, 변증상 ${weakestQhs[0]}(${qhsModern[weakestQhs[0]]}) 경향이 상대적으로 두드러집니다. 진료실에서 체질에 맞는 1:1 맞춤 감량 처방을 안내해 드리겠습니다.`;
+
+  document.getElementById('diet-app-shell').style.display='none';
+  const _rv=document.getElementById('diet-report-view'); _rv.classList.add('active'); triggerFadeIn(_rv.querySelector('.report-scroll'));
+  if(window.lucide) lucide.createIcons();
+  const statusEl=document.getElementById('diet-save-status'); if(statusEl) statusEl.innerText='';
+  if(!skipSave) saveDietRecordToSheet();
+}
+
+function saveDietRecordToSheet(){
+  const statusEl=document.getElementById('diet-save-status');
+  if(!isSheetConfigured()){ if(statusEl) statusEl.innerText='저장소 미설정'; return; }
+  if(statusEl) statusEl.innerText='저장 중...';
+  const payload = { category:'다이어트', name: dietFormData.name, birthDate:'', gender: dietFormData.gender, ageGroup:'', formData: dietFormData };
+  fetch(CONFIG.SHEET_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
+    .then(()=>{ if(statusEl) statusEl.innerText='저장 요청 완료 ✓'; })
+    .catch((err)=>{ console.error('저장 실패:',err); if(statusEl) statusEl.innerText='저장 실패 - 설정을 확인해 주세요'; });
+}
+
+/* ===================== 여성건강 모듈 ===================== */
+let womenCurrentStep = 1;
+let womenCameFromSearch = false;
+const womenTotalSteps = 4;
+const womenFormData = {
+  name:'', age:'', height:'', weight:'', chiefComplaint:'',
+  lastPeriodDate:'', periodCycle:'', periodAmount:'', periodPain:'', periodClots:'', pms:[], discharge:'',
+  coldHeat:'', sweat:'', digestion:'', appetite:'', sleepQuality:'', stool:'', urine:'',
+  liverSymptoms:[], heartSymptoms:[], spleenSymptoms:[], lungSymptoms:[], kidneySymptoms:[],
+  history:[], surgery:'없음'
+};
+window.updateWomenData = function(key,val){ womenFormData[key]=val; };
+window.updateWomenCheck = function(cat,val,checked){
+  if(checked){ if(!womenFormData[cat].includes(val)) womenFormData[cat].push(val); }
+  else{ womenFormData[cat]=womenFormData[cat].filter(i=>i!==val); }
+};
+window.setWomenRadio = function(field,val){ womenFormData[field]=val; refreshWomenStep(); };
+
+const WomenUI = {
+  group:(c)=>`<div class="bg-white rounded-[12px] overflow-hidden shadow-sm border border-[#E5E5EA] w-full">${c}</div>`,
+  inputRow:(label,field,placeholder,type="text",suffix="")=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white">
+      <span class="text-[16px] font-semibold text-black">${label}</span>
+      <div class="flex items-center gap-1">
+        <input type="${type}" oninput="updateWomenData('${field}', this.value)" value="${womenFormData[field]}" class="text-right text-[16px] text-[#8E8E93] font-medium outline-none w-40 placeholder:text-gray-300 bg-transparent" placeholder="${placeholder}">
+        ${suffix?`<span class="text-[#8E8E93] font-medium text-[15px]">${suffix}</span>`:''}
+      </div>
+    </div>`,
+  dateRow:(label,field)=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white">
+      <span class="text-[16px] font-semibold text-black">${label}</span>
+      <input type="date" onchange="updateWomenData('${field}', this.value)" value="${womenFormData[field]}" class="text-right text-[16px] text-[#8E8E93] font-medium outline-none bg-transparent">
+    </div>`,
+  textarea:(field,placeholder)=>`
+    <div class="bg-white rounded-[12px] p-5 shadow-sm border border-[#E5E5EA]">
+      <textarea oninput="updateWomenData('${field}', this.value)" class="w-full h-24 outline-none resize-none text-[16px] font-medium text-black placeholder:text-gray-300 bg-transparent" placeholder="${placeholder}">${womenFormData[field]}</textarea>
+    </div>`,
+  selectRow:(label,field,options)=>`
+    <div class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white gap-3">
+      <span class="text-[15px] font-semibold text-black shrink-0">${label}</span>
+      <select onchange="updateWomenData('${field}', this.value)" class="text-right text-[14px] text-[#8E8E93] font-medium outline-none bg-transparent flex-1">
+        <option value="">선택</option>
+        ${options.map(o=>`<option value="${o}" ${womenFormData[field]===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+    </div>`,
+  radioList:(field,options)=>`<div>${options.map(opt=>`
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] last:border-0 bg-white cursor-pointer active:bg-gray-50" onclick="setWomenRadio('${field}','${opt.replace(/'/g,"\\'")}')">
+      <span class="text-[15px] font-semibold text-black">${opt}</span>
+      <div class="w-5 h-5 rounded-full border-2 ${womenFormData[field]===opt?'border-pink-500 bg-pink-500':'border-gray-300'} flex items-center justify-center shrink-0">
+        ${womenFormData[field]===opt?'<div class="w-2 h-2 bg-white rounded-full"></div>':''}
+      </div>
+    </label>`).join('')}</div>`,
+  checkRow:(label,category,value)=>`
+    <label class="flex items-center justify-between p-4 px-5 border-b border-[#E5E5EA] bg-white cursor-pointer active:bg-gray-50 transition-colors">
+      <span class="text-[15px] font-semibold text-black">${label}</span>
+      <div class="relative flex items-center justify-center">
+        <input type="checkbox" class="sr-only peer" onchange="updateWomenCheck('${category}', '${value}', this.checked)" ${womenFormData[category].includes(value)?'checked':''}>
+        <i data-lucide="check" class="w-6 h-6 text-pink-500 opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></i>
+      </div>
+    </label>`,
+  checkGrid:(items,category)=>`<div class="md:grid md:grid-cols-2 md:divide-x md:divide-[#E5E5EA]">${items.map(v=>WomenUI.checkRow(v,category,v)).join('')}</div>`,
+  header:(t)=>`<h2 class="text-[26px] font-extrabold tracking-tight text-black mb-2 mt-8 px-2 first:mt-0">${t}</h2>`,
+  subhead:(t)=>`<div class="text-[13px] font-bold text-[#8E8E93] uppercase tracking-wider mb-2 mt-6 px-4">${t}</div>`
+};
+
+const WOMEN_OPT_LIVER = ['쉽게 피로하고 지친다','짜증/화가 많다','옆구리가 결리거나 아프다','눈이 침침하고 피로하다','근육에 쥐가 잘 난다','멍이 잘 든다','어지러움/두통'];
+const WOMEN_OPT_HEART = ['가슴이 답답/두근거림','잘 놀란다','꿈을 많이 꾼다','건망증이 심하다','안색이 창백하다','손발이 차고 저리다','얼굴이 붉다'];
+const WOMEN_OPT_SPLEEN = ['소화가 잘 안된다','식욕이 없다','몸이 무겁다','눕기를 좋아한다','멀미/구역감','입술이 트거나 마른다','멍이 잘 든다'];
+const WOMEN_OPT_LUNG = ['감기에 자주 걸린다','기침/가래가 잦다','숨이 차다','피부가 건조하다','비염/알레르기가 있다','목소리에 힘이 없다'];
+const WOMEN_OPT_KIDNEY = ['허리/무릎이 아프다','소변을 자주 본다','부종/다크서클','귀에서 소리가 난다(이명)','모발건조/탈모','새벽 설사'];
+const WOMEN_OPT_HISTORY = ['고혈압','당뇨','갑상선질환','자궁근종/내막증','방광염/신장염','비염/천식'];
+const WOMEN_OPT_PMS = ['가슴통증/팽만감','아랫배/허리 통증','감정기복/우울','소화불량/변비','두통/어지럼증'];
+
+const womenSections = {
+  2:{ navTitle:'기본 정보', html:()=>`
+    ${WomenUI.header('기본 정보')}
+    ${WomenUI.group(`
+      ${WomenUI.inputRow('성함','name','이름 입력')}
+      ${WomenUI.inputRow('나이','age','0','number','세')}
+      ${WomenUI.inputRow('키','height','0','number','cm')}
+      ${WomenUI.inputRow('체중','weight','0','number','kg')}
+    `)}
+    ${WomenUI.subhead('가장 불편한 증상 (주호소)')}
+    ${WomenUI.textarea('chiefComplaint','예: 심한 생리통, 만성 피로, 소화 불량 등')}
+  `},
+  3:{ navTitle:'자궁 · 월경', html:()=>`
+    ${WomenUI.header('자궁 및 월경 건강')}
+    ${WomenUI.group(WomenUI.dateRow('마지막 월경 시작일 (LMP)','lastPeriodDate'))}
+    ${WomenUI.subhead('월경 주기')}
+    ${WomenUI.group(WomenUI.radioList('periodCycle',['규칙적 (28-30일)','짧은 편 (<25일)','긴 편 (>35일)','불규칙']))}
+    ${WomenUI.subhead('월경 양')}
+    ${WomenUI.group(WomenUI.radioList('periodAmount',['보통','많은 편','적은 편','매우 적음']))}
+    ${WomenUI.subhead('생리통 정도')}
+    ${WomenUI.group(WomenUI.radioList('periodPain',['없음/미약','보통 (참을만함)','심함 (진통제 필수)','일상 불가']))}
+    ${WomenUI.subhead('혈액 양상 (덩어리)')}
+    ${WomenUI.group(WomenUI.radioList('periodClots',['없음 (맑음)','약간 있음','많음 (덩어리)','검붉고 끈적함']))}
+    ${WomenUI.subhead('월경 전 증후군 (PMS) 및 기타 증상 (다중 선택)')}
+    ${WomenUI.group(WomenUI.checkGrid(WOMEN_OPT_PMS,'pms'))}
+    ${WomenUI.subhead('냉/대하 (분비물)')}
+    ${WomenUI.group(WomenUI.radioList('discharge',['없음/정상','약간 있음','많음','냄새/가려움 동반']))}
+  `},
+  4:{ navTitle:'전신 상태', html:()=>`
+    ${WomenUI.header('전신 생리 지표')}
+    ${WomenUI.subhead('추위/더위 (한열)')}
+    ${WomenUI.group(WomenUI.radioList('coldHeat',['보통','추위를 많이 탐','더위를 많이 탐','상열감 (얼굴 화끈)']))}
+    ${WomenUI.subhead('땀 (발한)')}
+    ${WomenUI.group(WomenUI.radioList('sweat',['보통','잘 안나는 편','조금만 움직여도 남','잘 때 식은땀(도한)']))}
+    ${WomenUI.subhead('소화 · 식욕')}
+    ${WomenUI.group(`
+      ${WomenUI.selectRow('소화 상태','digestion',['소화 잘됨','소화불량/더부룩','자주 체함','속쓰림/신물'])}
+      ${WomenUI.selectRow('식욕 상태','appetite',['보통','식욕 좋음(과식)','식욕없음','입맛이 씀/없음'])}
+    `)}
+    ${WomenUI.subhead('수면 상태')}
+    ${WomenUI.group(WomenUI.radioList('sleepQuality',['숙면함','꿈이 많음','자주 깸','입면장애(잠들기 힘듦)']))}
+    ${WomenUI.subhead('대변 · 소변')}
+    ${WomenUI.group(WomenUI.radioList('stool',['정상','변비','설사/묽은변','불규칙']))}
+    ${WomenUI.group(WomenUI.radioList('urine',['정상','자주 봄(빈뇨)','시원찮음','진하고 냄새남']))}
+  `},
+  5:{ navTitle:'오장 · 과거력', html:()=>`
+    ${WomenUI.header('오장(五臟) 체크')}
+    ${WomenUI.subhead('간(肝) — 피로, 스트레스')}
+    ${WomenUI.group(WomenUI.checkGrid(WOMEN_OPT_LIVER,'liverSymptoms'))}
+    ${WomenUI.subhead('심(心) — 순환, 정신')}
+    ${WomenUI.group(WomenUI.checkGrid(WOMEN_OPT_HEART,'heartSymptoms'))}
+    ${WomenUI.subhead('비(脾) — 소화, 흡수')}
+    ${WomenUI.group(WomenUI.checkGrid(WOMEN_OPT_SPLEEN,'spleenSymptoms'))}
+    ${WomenUI.subhead('폐(肺) — 호흡, 면역')}
+    ${WomenUI.group(WomenUI.checkGrid(WOMEN_OPT_LUNG,'lungSymptoms'))}
+    ${WomenUI.subhead('신(腎) — 생식, 비뇨')}
+    ${WomenUI.group(WomenUI.checkGrid(WOMEN_OPT_KIDNEY,'kidneySymptoms'))}
+    ${WomenUI.header('과거력 및 수술 이력')}
+    ${WomenUI.group(WomenUI.checkGrid(WOMEN_OPT_HISTORY,'history'))}
+    ${WomenUI.subhead('수술 경험')}
+    ${WomenUI.group(WomenUI.radioList('surgery',['없음','있음']))}
+  `}
+};
+
+function womenRenderProgress(){
+  const fill=document.getElementById('women-progress-fill');
+  const pct = womenCurrentStep<=1 ? 0 : ((womenCurrentStep-1)/womenTotalSteps)*100;
+  fill.style.width=pct+'%';
+}
+function refreshWomenStep(){
+  if(womenCurrentStep===1) return;
+  const container=document.getElementById('women-dynamic-container');
+  container.innerHTML = womenSections[womenCurrentStep].html();
+  if(window.lucide) lucide.createIcons();
+  womenRenderProgress();
+}
+window.womenUpdateUI = function(){
+  triggerFadeIn(document.getElementById('women-dynamic-container'));
+  document.querySelectorAll('.women-step-content').forEach(s=>s.classList.remove('active'));
+  const bottomAction=document.getElementById('women-bottom-action'), nextBtn=document.getElementById('women-next-btn'),
+        backLabel=document.getElementById('women-btn-back-label'), navTitle=document.getElementById('women-nav-title'),
+        scrollContainer=document.getElementById('women-scroll-container');
+  if(womenCurrentStep===1){
+    document.getElementById('women-step-1').classList.add('active');
+    bottomAction.classList.add('hidden'); backLabel.innerText='메인으로'; navTitle.innerText='소개';
+  } else {
+    const config=womenSections[womenCurrentStep];
+    const container=document.getElementById('women-dynamic-container');
+    container.innerHTML=config.html(); container.classList.add('active');
+    bottomAction.classList.remove('hidden'); backLabel.innerText='이전'; navTitle.innerText=config.navTitle;
+    nextBtn.innerText = (womenCurrentStep===womenTotalSteps) ? '완료 및 리포트 생성' : '다음 단계';
+  }
+  womenRenderProgress(); if(window.lucide) lucide.createIcons();
+  if(scrollContainer) scrollContainer.scrollTo(0,0);
+};
+window.womenNextStep = function(){ if(womenCurrentStep<womenTotalSteps){ womenCurrentStep++; womenUpdateUI(); } else { generateWomenReportAndShow(); } };
+window.womenPrevStep = function(){ if(womenCurrentStep>1){ womenCurrentStep--; womenUpdateUI(); } else { document.getElementById('women-app-shell').style.display='none'; returnToHub(); } };
+window.enterWomenSurvey = function(){
+  document.getElementById('hub-view').style.display='none';
+  const shell=document.getElementById('women-app-shell'); shell.style.display='flex'; triggerFadeIn(shell);
+  womenCurrentStep=1; womenUpdateUI();
+};
+window.womenBackToForm = function(){
+  document.getElementById('women-report-view').classList.remove('active');
+  if(womenCameFromSearch){
+    womenCameFromSearch=false;
+    document.getElementById('search-view').style.display='block';
+  } else {
+    document.getElementById('women-app-shell').style.display='flex';
+    womenCurrentStep=womenTotalSteps; womenUpdateUI();
+  }
+};
+
+/* ----- H-SCALE 스코어링 (증상강도 계산 후, 건강도=100-강도 로 환산) ----- */
+function calcWomenOrganHealth(){
+  const f=womenFormData;
+  let s={liver:30,heart:30,spleen:30,lung:30,kidney:30};
+  s.liver += f.liverSymptoms.length*15;
+  if(f.pms.includes('감정기복/우울')) s.liver+=10;
+  s.heart += f.heartSymptoms.length*15;
+  if(f.sleepQuality==='자주 깸'||f.sleepQuality==='입면장애(잠들기 힘듦)') s.heart+=10;
+  s.spleen += f.spleenSymptoms.length*15;
+  if(f.digestion && f.digestion!=='소화 잘됨') s.spleen+=10;
+  if(f.appetite==='식욕없음') s.spleen+=10;
+  s.lung += f.lungSymptoms.length*15;
+  if(f.sweat==='조금만 움직여도 남') s.lung+=10;
+  if(f.history.includes('비염/천식')) s.lung+=10;
+  s.kidney += f.kidneySymptoms.length*15;
+  if(f.history.includes('방광염/신장염')) s.kidney+=15;
+  if(f.coldHeat==='추위를 많이 탐') s.kidney+=10;
+  if(f.urine && f.urine!=='정상') s.kidney+=10;
+  Object.keys(s).forEach(k=>{ if(s[k]>100) s[k]=100; if(s[k]<20) s[k]=20; });
+  return { '간':Math.max(8,120-s.liver), '심':Math.max(8,120-s.heart), '비':Math.max(8,120-s.spleen), '폐':Math.max(8,120-s.lung), '신':Math.max(8,120-s.kidney) };
+}
+function calcWomenQiBloodWater(){
+  const f=womenFormData;
+  let s={qiDef:30,qiStag:20,bloodDef:30,bloodStasis:20,dampness:20,heat:20};
+  if(f.spleenSymptoms.includes('쉽게 피로하고 지친다')) s.qiDef+=20;
+  if(f.lungSymptoms.includes('감기에 자주 걸린다')) s.qiDef+=15;
+  if(f.digestion==='소화불량/더부룩') s.qiDef+=15;
+  if(f.appetite==='식욕없음') s.qiDef+=10;
+  if(f.periodAmount==='적은 편') s.qiDef+=10;
+  if(f.liverSymptoms.includes('짜증/화가 많다')) s.qiStag+=25;
+  if(f.heartSymptoms.includes('가슴이 답답/두근거림')) s.qiStag+=15;
+  if(f.pms.includes('감정기복/우울')) s.qiStag+=20;
+  if(f.pms.includes('가슴통증/팽만감')) s.qiStag+=15;
+  if(f.periodCycle==='불규칙') s.qiStag+=10;
+  if(f.heartSymptoms.includes('안색이 창백하다')) s.bloodDef+=20;
+  if(f.liverSymptoms.includes('어지러움/두통')) s.bloodDef+=20;
+  if(f.kidneySymptoms.includes('모발건조/탈모')) s.bloodDef+=15;
+  if(f.periodAmount==='매우 적음') s.bloodDef+=20;
+  if(f.sleepQuality==='꿈이 많음') s.bloodDef+=10;
+  if(f.periodPain==='심함 (진통제 필수)') s.bloodStasis+=30;
+  if(f.periodClots==='많음 (덩어리)') s.bloodStasis+=25;
+  if(f.liverSymptoms.includes('멍이 잘 든다')) s.bloodStasis+=15;
+  if(f.surgery==='있음') s.bloodStasis+=15;
+  if(f.pms.includes('아랫배/허리 통증')) s.bloodStasis+=10;
+  if(f.kidneySymptoms.includes('부종/다크서클')) s.dampness+=25;
+  if(f.spleenSymptoms.includes('몸이 무겁다')) s.dampness+=20;
+  if(f.spleenSymptoms.includes('멀미/구역감')) s.dampness+=15;
+  if(f.discharge==='많음') s.dampness+=20;
+  if(f.stool==='설사/묽은변') s.dampness+=10;
+  if(f.coldHeat==='더위를 많이 탐') s.heat+=20;
+  if(f.coldHeat==='상열감 (얼굴 화끈)') s.heat+=25;
+  if(f.heartSymptoms.includes('얼굴이 붉다')) s.heat+=15;
+  if(f.urine==='진하고 냄새남') s.heat+=15;
+  if(f.history.includes('고혈압')) s.heat+=10;
+  Object.keys(s).forEach(k=>{ if(s[k]>100) s[k]=100; if(s[k]<20) s[k]=20; });
+  return { '기허':Math.max(8,120-s.qiDef), '기울':Math.max(8,120-s.qiStag), '혈허':Math.max(8,120-s.bloodDef), '어혈':Math.max(8,120-s.bloodStasis), '수체':Math.max(8,120-s.dampness), '열':Math.max(8,120-s.heat) };
+}
+
+function generateWomenReportAndShow(skipSave){
+  const f=womenFormData, todayStr=new Date().toLocaleDateString('ko-KR');
+  document.title = `${(f.name||'이름미상').replace(/\s+/g,'')}_여성건강_${new Date().toISOString().slice(0,10).replace(/-/g,'')}`;
+
+  document.getElementById('women-rp-name').innerText=f.name||'미입력';
+  document.getElementById('women-rp-age').innerText=f.age?`${f.age}세`:'-';
+  document.getElementById('women-rp-body').innerText=`${f.height||'0'}cm / ${f.weight||'0'}kg`;
+  document.getElementById('women-rp-lmp').innerText=f.lastPeriodDate||'미입력';
+  document.getElementById('women-rp-date').innerText=todayStr;
+  document.getElementById('women-rp-complaint').innerText=f.chiefComplaint||'특이 호소 증상 없음';
+  document.getElementById('women-rp-footer-1').innerText=`측정일: ${todayStr}`;
+  document.getElementById('women-rp-footer-2').innerText=`측정일: ${todayStr}`;
+  document.getElementById('women-badge-1').innerText='1 / 2';
+
+  const organ=calcWomenOrganHealth(), qhs=calcWomenQiBloodWater();
+  drawRadar(organ,'women-rp-radar'); drawRadar(qhs,'women-rp-qhs-radar');
+  const organModern={'간':'피로·해독','심':'순환·정신','비':'소화·흡수','폐':'호흡·면역','신':'생식·비뇨'};
+  const qhsModern={'기허':'기운부족','기울':'스트레스','혈허':'혈액부족','어혈':'혈액순환','수체':'부종·노폐물','열':'염증·화'};
+  renderLegend('women-rp-organ-legend', organ, organModern);
+  renderLegend('women-rp-qhs-legend', qhs, qhsModern);
+
+  const organAvg = Object.values(organ).reduce((a,b)=>a+b,0)/Object.values(organ).length;
+  const qhsAvg = Object.values(qhs).reduce((a,b)=>a+b,0)/Object.values(qhs).length;
+  const hscaleScore = Math.round((organAvg+qhsAvg)/2);
+  let grade='관찰필요', color='#dc2626';
+  if(hscaleScore>=80){ grade='우수'; color='#16a34a'; }
+  else if(hscaleScore>=60){ grade='양호'; color='#65a30d'; }
+  else if(hscaleScore>=40){ grade='보통'; color='#d97706'; }
+  document.getElementById('women-hscale-score').innerText=hscaleScore;
+  document.getElementById('women-hscale-ring').style.background=`conic-gradient(${color} ${hscaleScore}%, #E5E5EA 0)`;
+  document.getElementById('women-hscale-grade').innerText=`종합 건강 스코어 ${hscaleScore}점 · ${grade}`;
+
+  const lifestyleLines=[];
+  if(f.coldHeat) lifestyleLines.push(`한열: ${f.coldHeat}`);
+  if(f.sweat) lifestyleLines.push(`땀: ${f.sweat}`);
+  if(f.digestion||f.appetite) lifestyleLines.push(`소화/식욕: ${f.digestion||'-'} · ${f.appetite||'-'}`);
+  if(f.sleepQuality) lifestyleLines.push(`수면: ${f.sleepQuality}`);
+  if(f.stool||f.urine) lifestyleLines.push(`대소변: ${f.stool||'-'} · ${f.urine||'-'}`);
+  document.getElementById('women-rp-lifestyle').innerHTML = lifestyleLines.length ? lifestyleLines.map(l=>`<div class="mb-1.5">• ${l}</div>`).join('') : '<div>입력된 정보가 없습니다.</div>';
+
+  document.getElementById('women-rp-period').innerHTML = `
+    <div class="mb-1.5">• LMP: ${f.lastPeriodDate||'미입력'} · 주기: ${f.periodCycle||'-'} · 월경량: ${f.periodAmount||'-'}</div>
+    <div class="mb-1.5">• 생리통: ${f.periodPain||'-'} · 혈액 양상: ${f.periodClots||'-'}</div>
+    <div class="mb-1.5">• 냉/대하: ${f.discharge||'-'}</div>
+    <div>• PMS: ${f.pms.length?f.pms.join(', '):'해당 없음'}</div>`;
+
+  document.getElementById('women-rp-history').innerHTML = `
+    <div class="mb-1.5">• 과거 병력: ${f.history.length?f.history.join(', '):'해당 없음'}</div>
+    <div>• 수술 경험: ${f.surgery}</div>`;
+
+  const weakestOrgan=Object.entries(organ).sort((a,b)=>a[1]-b[1])[0];
+  const weakestQhs=Object.entries(qhs).sort((a,b)=>a[1]-b[1])[0];
+  document.getElementById('women-rp-overall').innerText =
+    `주호소 "${f.chiefComplaint||'특이 증상 없음'}"과 문진 응답을 종합하면 오장 중 ${weakestOrgan[0]}(${organModern[weakestOrgan[0]]}) 계통과, 변증상 ${weakestQhs[0]}(${qhsModern[weakestQhs[0]]}) 경향이 상대적으로 두드러집니다. 진료실에서 체질과 자궁 건강에 맞춘 처방과 관리 계획을 안내해 드리겠습니다.`;
+
+  document.getElementById('women-app-shell').style.display='none';
+  const _rv=document.getElementById('women-report-view'); _rv.classList.add('active'); triggerFadeIn(_rv.querySelector('.report-scroll'));
+  if(window.lucide) lucide.createIcons();
+  const statusEl=document.getElementById('women-save-status'); if(statusEl) statusEl.innerText='';
+  if(!skipSave) saveWomenRecordToSheet();
+}
+
+function saveWomenRecordToSheet(){
+  const statusEl=document.getElementById('women-save-status');
+  if(!isSheetConfigured()){ if(statusEl) statusEl.innerText='저장소 미설정'; return; }
+  if(statusEl) statusEl.innerText='저장 중...';
+  const payload = { category:'여성', name: womenFormData.name, birthDate: womenFormData.age, gender:'여성', ageGroup:'', formData: womenFormData };
+  fetch(CONFIG.SHEET_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
+    .then(()=>{ if(statusEl) statusEl.innerText='저장 요청 완료 ✓'; })
+    .catch((err)=>{ console.error('저장 실패:',err); if(statusEl) statusEl.innerText='저장 실패 - 설정을 확인해 주세요'; });
+}
+
+window.onload=()=>{ document.getElementById('hub-view').style.display='flex'; };
 </script>
 </body>
 </html>
